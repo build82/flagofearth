@@ -21,9 +21,10 @@
 
 define(['dojo/dom',
         'dojo/on',
-		'build82/reimg'
+		'build82/reimg',
+		'build82/context_blender',
         ], 
-    function(dom, on, reimg) {
+    function(dom, on, reimg, blender) {
 		var config = {
 			canvas_id: 'image_result',
 			staticImage_url: 'images/ifoe_static.png',
@@ -125,21 +126,17 @@ define(['dojo/dom',
 			ctx.mozImageSmoothingEnabled = false;
 			ctx.msImageSmoothingEnabled = false;
 			ctx.imageSmoothingEnabled = false;
-			ctx.globalCompositeOperation = "source-over";
-			ctx.globalAlpha = 1;
 			
 			// clear canvas (white background)
 			ctx.fillStyle = "#FFFFFF";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			
 			if(data.userImage) {
-				centerImage(ctx, data.userImage);
+				centerImage(ctx, data.userImage, "source-over", 100);
 			}
 			
 			if(data.staticImage) {
-				ctx.globalAlpha = dom.byId(config.control.opacity_id).value / 100;
-				ctx.globalCompositeOperation = dom.byId(config.control.blendmode_id).value;
-				centerImage(ctx, data.staticImage);
+				centerImage(ctx, data.staticImage, dom.byId(config.control.blendmode_id).value, dom.byId(config.control.opacity_id).value);
 			}
 		},
 		
@@ -147,9 +144,11 @@ define(['dojo/dom',
 		 * center an image on a canvas (via its drawing context)
 		 * @param param_context 2d canvas graphics context to compute center
 		 * @param param_image image data to draw centered onto context
+		 * @param param_mode blending mode to apply to param_image
+		 * @param param_opacity transparenct to apply to param_image before blending
 		 * @returns void
 		 */
-		centerImage = function(param_context, param_image) {
+		centerImage = function(param_context, param_image, param_mode, param_opacity) {
 			var scaled = {width:null, height:null};
 			if(param_context.canvas.height >= param_context.canvas.width) {
 				// tall canvas
@@ -167,7 +166,18 @@ define(['dojo/dom',
 				y: param_context.canvas.height/2 - scaled.height/2
 			};
 			
-			param_context.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
+			// draw param_image to context
+			var offscreenCanvas = document.createElement('canvas');
+			offscreenCanvas.width  = param_context.canvas.width;
+			offscreenCanvas.height = param_context.canvas.height;
+			var imgContext = offscreenCanvas.getContext("2d");
+			imgContext.mozImageSmoothingEnabled = false;
+			imgContext.msImageSmoothingEnabled = false;
+			imgContext.imageSmoothingEnabled = false;
+			imgContext.globalAlpha = param_opacity / 100;
+			imgContext.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
+			
+			blender.blend(imgContext, param_context, param_mode);
 		},
 				
 		/**
