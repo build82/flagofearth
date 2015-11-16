@@ -26,7 +26,7 @@ define(['dojo/dom',
     function(dom, on, reimg) {
 		var config = {
 			canvas_id: 'image_result',
-			staticImage_url: 'images/ifoe_static.svg',
+			staticImage_url: 'images/ifoe_static.png',
 			control: {
 				select_id: 'control_image_selector',
 				opacity_id: 'control_image_opacity',
