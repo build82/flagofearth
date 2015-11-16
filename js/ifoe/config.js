@@ -24,7 +24,9 @@ define([],
 		return {
 			Link: [
 				{url: 'http://www.flagofplanetearth.com', name: 'The International Flag of Planet Earth', type: 'website'},
-				{url: 'https://en.wikipedia.org/wiki/Flag_of_the_Earth', name: 'Wikipedia - Flag of the Earth', type: 'website'}
+				{url: 'https://en.wikipedia.org/wiki/Flag_of_the_Earth', name: 'Wikipedia : Flag of the Earth', type: 'website'},
+				{url: 'https://www.facebook.com/ifoearth', name: 'Facebook : International Flag of Earth - Image Generator', type: 'website'}
+				
 			],
 			TypeName: {
 				website: 'Website',
