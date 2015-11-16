@@ -28,6 +28,12 @@ performance or use of this material.
     <title>International Flag of the Planet Earth : #HealTheWorld #SpreadLove #iFoE</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta property="og:url" content="http://ifoe.build82.com"/>
+    <meta property="og:image" content="http://ifoe.build82.com/images/ifoe_static.png"/>
+    <meta property="og:title" content="Planetary Solidarity"/>
+    <meta property="og:description" content="Overlay the 'International Flag of Planet Earth' over any image."/>
+    <meta property="og:type" content="website" />
+	
 	<link rel="stylesheet" type="text/css" href="css/flagofearth.css"/>
 	<link rel="index" title="iFoE Index" href="index.html"/>
 	<link rel="copyright" title="iFoE Copyright" href="copyright.html"/>
@@ -63,11 +69,13 @@ performance or use of this material.
 		</div>
 		<div class="controls">
 			<div class="control">
-				Select a file (or click image) : <input type="file" id="control_image_selector"/>
+				Select a file (or click image) : <input type="file" id="control_image_selector" accept="image/*"/>
 			</div>
+			<hr/>
 			<div class="control">
 				Tweak this (blend mode) : <select id="control_image_blend_mode">
-					<option value="multiply" selected>Multiply</option>
+					<option value="source-over" selected>No Blend</option>
+					<option value="multiply">Multiply</option>
 					<option value="overlay">Overlay</option>
 					<option value="screen">Screen</option>
 					<option value="hard-light">Hard-Light</option>
@@ -84,7 +92,7 @@ performance or use of this material.
 				</select>
 			</div>
 			<div class="control">
-				Looks good? : <button id="control_image_save">Download Image</button>
+				Looks good? : <button id="control_image_save">Save Image</button>
 			</div>
 		</div>
 	</div>

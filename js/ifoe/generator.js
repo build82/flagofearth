@@ -36,7 +36,8 @@ define(['dojo/dom',
 		},
 		data = {
 			staticImage: null,
-			userImage: null
+			userImage: null,
+			changed: false
 		},
 		
 		/**
@@ -46,8 +47,13 @@ define(['dojo/dom',
 		loadStaticImage = function() {
 			data.staticImage = new Image();
 			data.staticImage.addEventListener("load", function() {
+				data.changed = true;
 				generate();
+				data.changed = false;
+				inputDisable(false);
 			}, false);
+			
+			inputDisable(true);
 			data.staticImage.src = config.staticImage_url;
 		},
 		
@@ -64,9 +70,33 @@ define(['dojo/dom',
 				var reader = new FileReader();
 				reader.onloadend = function() {
 					data.userImage.src = reader.result;
-					generate();
+					setTimeout(function(){
+						generate();
+						inputDisable(false);
+					}, 1);
 				}
+				
+				inputDisable(true);
 				reader.readAsDataURL(file);
+			}
+		},
+			
+		/**
+		 * disable inputs while loading/processing (prevents browser crash)
+		 * @param param_bool bool true to disable inputs, false to enable
+		 * @returns void
+		 */
+		inputDisable = function(param_disabled_bool) {
+			dom.byId(config.control.select_id).disabled = param_disabled_bool;
+			dom.byId(config.control.blendmode_id).disabled = param_disabled_bool;
+			dom.byId(config.control.opacity_id).disabled = param_disabled_bool;
+			dom.byId(config.control.save_id).disabled = param_disabled_bool;
+			
+			if(param_disabled_bool) {
+				document.body.style.cursor = "wait";
+			}
+			else {
+				document.body.style.cursor = "default";
 			}
 		},
 		
@@ -75,6 +105,21 @@ define(['dojo/dom',
 		 * @returns void
 		 */
 		generate = function() {
+			// google analytics event
+			ga('send', {
+				hitType: 'event',
+				eventCategory: 'Processing',
+				eventAction: 'generate',
+				eventLabel: 'blendmode:'+dom.byId(config.control.blendmode_id).value+' opacity:'+dom.byId(config.control.opacity_id).value
+			});
+			
+			// default suggestion
+			if(!data.changed) {
+				dom.byId(config.control.blendmode_id).value = "hard-light";
+				dom.byId(config.control.opacity_id).value = "75";
+				data.changed = true;
+			}
+			
 			var canvas = document.getElementById(config.canvas_id);
 			var ctx = canvas.getContext("2d");
 			ctx.mozImageSmoothingEnabled = false;
@@ -125,7 +170,28 @@ define(['dojo/dom',
 			param_context.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
 		},
 				
+		/**
+		 * record change & initiate image generation
+		 * @params void
+		 */
+		handleParamChange = function() {
+			data.changed = true;
+			generate();
+		},
+		
+		/**
+		 * open image select dialog when image is clicked/touched
+		 * @returns void
+		 */
 		handleImageClick = function() {
+			// google analytics event
+			ga('send', {
+				hitType: 'event',
+				eventCategory: 'Interaction',
+				eventAction: 'click/touch',
+				eventLabel: 'image'
+			});
+			
 			dom.byId(config.control.select_id).click();
 		},
 		
@@ -134,15 +200,24 @@ define(['dojo/dom',
 		 * @returns void
 		 */		
 		handleSave = function() {
+			// google analytics event
+			ga('send', {
+				hitType: 'event',
+				eventCategory: 'Processing',
+				eventAction: 'save',
+				eventLabel: 'blendmode:'+dom.byId(config.control.blendmode_id).value+' opacity:'+dom.byId(config.control.opacity_id).value
+			});
+			
 			reimg.fromCanvas(dom.byId(config.canvas_id)).downloadPng();
 		};
 			
 		return {
 			Init: function() {
 				loadStaticImage();
+				
 				on(dom.byId(config.control.select_id), 'change', loadUserImage);
-				on(dom.byId(config.control.blendmode_id), 'change', generate);
-				on(dom.byId(config.control.opacity_id), 'change', generate);
+				on(dom.byId(config.control.blendmode_id), 'change', handleParamChange);
+				on(dom.byId(config.control.opacity_id), 'change', handleParamChange);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
 				on(dom.byId(config.canvas_id), 'click', handleImageClick);
 				

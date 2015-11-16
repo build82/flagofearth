@@ -85,7 +85,7 @@ header {
     }
     
     .title {
-        color: rgb(80, 80, 80);
+        color: $textGrey_clr - (2 * $lighten_clr);
         font-weight: bold;
     }
 
@@ -99,7 +99,7 @@ nav .feature {
 	margin: 1.2em auto;
 	width: 60%;
 	max-width: 375px;
-	border: 1px solid rgb(100, 100, 100);
+	border: 1px solid $textGrey_clr;
 	padding: 8px 5px 0 5px;
 	background-color: $feature_clr;
 	color: $textGrey_clr - ($darken_clr * 2);
@@ -123,11 +123,6 @@ nav .feature {
 		border-color: rgb(170, 170, 170);
 		margin: 10px 5px 10px 5px;
 	}
-	
-	.icon {
-		margin: 0 5px 10px 5px;
-		border: 1px solid rgb(120, 120, 120);
-	}
 }
 
 #nav_home {
@@ -150,23 +145,41 @@ nav .feature {
 	
 	.attribution {
 		color: $textBlack_clr;
-		font-size: .8em;
-		margin-bottom: 4em;
+		font-size: 1em;
+		
+		a {
+			color: $textGrey_clr;
+		}
+	}
+	
+	.controls {
+		@include shadow(0, 1px, 2px, 0, 0.6);
+		margin: 2em auto;
+		width: 30%;
+		max-width: 375px;
+		border: 1px solid $textGrey_clr;
+		padding: 5p;
+		background-color: $feature_clr;
+		color: $textGrey_clr - ($darken_clr * 2);
+		text-align: center;
 	}
 	
 	.control {
+		font-size: 1.2em;
 		margin: 1em auto;
+		
+		input[type="file"] {
+			border: 1px solid $menu_clr;
+		}
 		
 		select {
 			padding: .4em;
 		}
-	}
-}
-
-.controls {
-	button {
-		width: 200px;
-		height: 3em;
+		
+		button {
+			width: 150px;
+			height: 3em;
+		}
 	}
 }
 
@@ -176,17 +189,17 @@ body>div {
 
 #boilerplate {
 	display: block;
-	height: 2em;
+	height: 1em;
 }
 
 footer {
 	position: absolute;
 	bottom: 0;
-	font-size: .6em;
+	font-size: .75em;
 	color: lightgrey;
 	padding: 2px 0;
 	background-color: $header_clr + $lighten_clr;
-	border-top: 1px dotted rgb(220, 220, 220);
+	border-top: 1px dotted $header_clr + $darken_clr;
 	width: 100%;
 	
 	p {
