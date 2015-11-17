@@ -106,6 +106,8 @@ define(['dojo/dom',
 		 * @returns void
 		 */
 		generate = function() {
+			inputDisable(true);
+			
 			// google analytics event
 			ga('send', {
 				hitType: 'event',
@@ -117,7 +119,7 @@ define(['dojo/dom',
 			// default suggestion
 			if(!data.changed) {
 				dom.byId(config.control.blendmode_id).value = "hard-light";
-				dom.byId(config.control.opacity_id).value = "75";
+				dom.byId(config.control.opacity_id).value = "70";
 				data.changed = true;
 			}
 			
@@ -138,6 +140,8 @@ define(['dojo/dom',
 			if(data.staticImage) {
 				centerImage(ctx, data.staticImage, dom.byId(config.control.blendmode_id).value, dom.byId(config.control.opacity_id).value);
 			}
+			
+			inputDisable(false);
 		},
 		
 		/**
