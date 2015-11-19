@@ -45,10 +45,7 @@ define(['dojo/dom',
 		data = {
 			canvas: null,
 			canvasListener: null,
-			scrollPosition: {
-				x: 0,
-				y: 0
-			},
+			
 			staticImage: null,
 			userImage: null,
 			changed: false
@@ -164,6 +161,9 @@ define(['dojo/dom',
 			if(data.canvas) {
 				domConstruct.destroy(data.canvas);
 				delete data.canvas;
+			}
+			
+			if(data.canvasListener) {
 				data.canvasListener.remove();
 				data.canvasListener = null;
 			}
@@ -262,7 +262,7 @@ define(['dojo/dom',
 			setTimeout(function(){
 				element.style.display = disp;
 				n.parentNode.removeChild(n);
-				window.scroll(data.scrollPosition.x, data.scrollPosition.y);
+				window.scroll(0, 0);
 			}, 1); // you can play with this timeout to make it as short as possible
 		},
 		
@@ -299,7 +299,6 @@ define(['dojo/dom',
 			};
 			
 			// draw on matte
-			// setup context & smoothing
 			var canvas = domConstruct.create('canvas');
 			canvas.width = param_context.canvas.width;
 			canvas.height = param_context.canvas.height;
@@ -386,14 +385,13 @@ define(['dojo/dom',
 			
 			inputDisable(true);
 			var ctx = createFinalContext();
+			
 			if(data.userImage) {
-				centerImage(ctx, data.userImage, null, 100);
+				centerImage(ctx, data.userImage, null, 100, "source-over", 100);
 			}
 			if(data.staticImage) {
-				ctx.globalAlpha = dom.byId(config.form_id)['opacity'].value / 100;
-				ctx.globalCompositeOperation = dom.byId(config.form_id)['blendmode'].value;
 				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
-				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value);
+				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value, dom.byId(config.form_id)['blendmode'].value, dom.byId(config.form_id)['opacity'].value);
 			}
 			reimg.fromCanvas(ctx.canvas).downloadPng();
 			inputDisable(false);
@@ -417,10 +415,7 @@ define(['dojo/dom',
 				on(dom.byId(config.control.save_id), 'click', handleSave);
 				
 				// initial click
-				var imageListener = on(dom.byId(config.canvasContainer_id), 'click', function() {
-					imageListener.remove();
-					dom.byId(config.control.select_id).click();
-				});
+				data.canvasListener = on(dom.byId(config.canvasContainer_id), 'click', handleImageClick);
 				
 				// disable generate / save
 				dom.byId(config.control.generate_id).disabled = true;
