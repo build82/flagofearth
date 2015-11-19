@@ -29,7 +29,6 @@ define(['dojo/dom',
     function(dom, domConstruct, domClass, on, baseFx, reimg) {
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
-			interfaceRefreshDuration: 5000,				// total fade duration (ms)
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
 			staticImage_url: 'images/ifoe_white.png',	// transparent with white graphic
 			defaultSize: {								// default size
@@ -38,6 +37,7 @@ define(['dojo/dom',
 			},
 			control: {									
 				select_id: 'control_image_selector',	// file select element
+				generate_id: 'control_image_generate',	// generate button
 				save_id: 'control_image_save'			// save button
 			},
 			form_id: 'control_form'						// form with "blendmode", "opacity", and "size"
@@ -45,7 +45,10 @@ define(['dojo/dom',
 		data = {
 			canvas: null,
 			canvasListener: null,
-			scrollPosition: null,
+			scrollPosition: {
+				x: 0,
+				y: 0
+			},
 			staticImage: null,
 			userImage: null,
 			changed: false
@@ -55,16 +58,12 @@ define(['dojo/dom',
 		 * loads the 'overlay' image (flag, banner, etc.)
 		 * @returns void
 		 */
-		loadStaticImage = function() {
+		loadStaticImage = function(param_func) {
 			data.staticImage = new Image();
 			data.staticImage.addEventListener("load", function() {
-				data.changed = true;
-				generate();
-				data.changed = false;
-				inputDisable(false);
-			}, false);
+				param_func();
+			}, this);
 			
-			inputDisable(true);
 			data.staticImage.src = config.staticImage_url;
 		},
 		
@@ -82,12 +81,10 @@ define(['dojo/dom',
 				reader.onloadend = function() {
 					data.userImage.src = reader.result;
 					setTimeout(function(){
-						generate();
-						inputDisable(false);
+						handleGenerate();
 					}, 10);
 				}
 				
-				inputDisable(true);
 				reader.readAsDataURL(file);
 			}
 		},
@@ -99,6 +96,7 @@ define(['dojo/dom',
 		 */
 		inputDisable = function(param_disabled_bool) {
 			dom.byId(config.control.select_id).disabled = param_disabled_bool;
+			dom.byId(config.control.generate_id).disabled = param_disabled_bool;
 			dom.byId(config.control.save_id).disabled = param_disabled_bool;
 			dom.byId(config.form_id)['blendmode'].disabled = param_disabled_bool;
 			dom.byId(config.form_id)['opacity'].disabled = param_disabled_bool;
@@ -140,37 +138,28 @@ define(['dojo/dom',
 			}
 			
 			// create drawing context (prevent dom jump)
-			saveScrollPosition();
 			destroyOldContext();
 			var ctx = createPreviewContext();
 			redrawBrowser();
 			
 			// draw images
 			if(data.userImage) {
-				centerImage(ctx, data.userImage, null, 100);
+				centerImage(ctx, data.userImage, null, 100, "source-over", 100);
 			}
 			
 			if(data.staticImage) {
-				ctx.globalAlpha = dom.byId(config.form_id)['opacity'].value / 100;
-				ctx.globalCompositeOperation = dom.byId(config.form_id)['blendmode'].value;
 				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
-				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value);
+				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value, dom.byId(config.form_id)['blendmode'].value, dom.byId(config.form_id)['opacity'].value);
 			}
 			
 			inputDisable(false);
+			dom.byId(config.control.generate_id).disabled = true;
 		},
-				
-		saveScrollPosition = function() {
-			data.scrollPosition = {
-				x: window.scrollX,
-				y: window.scrollY
-			};
-		};
 		
-		restoreScrollPosition = function() {
-			window.scroll(data.scrollPosition.x, data.scrollPosition.y);
-		},
-				
+		/**
+		 * remove preview canvas
+		 * @returns void
+		 */
 		destroyOldContext = function() {
 			if(data.canvas) {
 				domConstruct.destroy(data.canvas);
@@ -182,6 +171,10 @@ define(['dojo/dom',
 			dom.byId(config.canvasContainer_id).innerHTML = null;
 		},
 		
+		/**
+		 * prepare previw canvas
+		 * @returns void
+		 */
 		createPreviewContext = function() {
 			data.canvas = domConstruct.create('canvas');
 			data.canvas.className = "responsive";
@@ -220,15 +213,17 @@ define(['dojo/dom',
 			
 			// setup context & smoothing
 			var ctx = data.canvas.getContext("2d");
-			ctx.globalCompositeOperation = "source-over";
-			ctx.globalAlpha = 1;
 			ctx.mozImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
 			ctx.msImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
 			ctx.imageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
 			
 			return ctx;
 		},
-				
+			
+		/**
+		 * prepare final export canvas
+		 * @returns void
+		 */
 		createFinalContext = function() {
 			var canvas = domConstruct.create('canvas');
 			
@@ -251,42 +246,37 @@ define(['dojo/dom',
 			return ctx;
 		},
 			
-		// refresh dom to fix Chrome display bug
+		/**
+		 * force browser refresh to fix Chrome display bug
+		 * @returns void
+		 */
 		redrawBrowser = function() {
 			var element = dom.byId(config.interface_id);
 			var n = document.createTextNode(' ');
 			var disp = element.style.display;  // don't worry about previous display style
 			
 			// fade out
-			baseFx.fadeOut({
-				node: element,
-				duration: config.interfaceRefreshDuration/2,
-				end: function() {
-					element.appendChild(n);
-					element.style.display = 'none';
+			element.appendChild(n);
+			element.style.display = 'none';
 
-					setTimeout(function(){
-						element.style.display = disp;
-						n.parentNode.removeChild(n);
-						restoreScrollPosition();
-
-						// fade in
-						baseFx.fadeIn({
-							node: element,
-							duration: config.interfaceRefreshDuration/2
-						}).play();
-					}, 1); // you can play with this timeout to make it as short as possible
-				}
-			}).play();
+			setTimeout(function(){
+				element.style.display = disp;
+				n.parentNode.removeChild(n);
+				window.scroll(data.scrollPosition.x, data.scrollPosition.y);
+			}, 1); // you can play with this timeout to make it as short as possible
 		},
 		
 		/**
 		 * center an image on a canvas (via its drawing context)
-		 * @param param_context 2d canvas graphics context to compute center
-		 * @param param_image image data to draw centered onto context
+		 * @param param_context CanvasRenderingContext2D canvas graphics context to compute center
+		 * @param param_image HTMLImageElement image data to draw centered onto context
+		 * @param param_matte string hex color to matte param_image on before composite
+		 * @param param_scale int integer percent to scale param_image before composite
+		 * @param param_blendmode string blendmode to use during composite
+		 * @param param_opacity int integer percent to apply opacity
 		 * @returns void
 		 */
-		centerImage = function(param_context, param_image, param_matte, param_scale) {
+		centerImage = function(param_context, param_image, param_matte, param_scale, param_blendmode, param_opacity) {
 			var scaled = {width:null, height:null};
 			if(param_context.canvas.height >= param_context.canvas.width) {
 				// tall canvas
@@ -323,7 +313,11 @@ define(['dojo/dom',
 			}
 			ctx.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
 			
+			// draw opacity
+			param_context.globalAlpha = param_opacity / 100;
+			
 			// draw on context
+			param_context.globalCompositeOperation = param_blendmode;
 			param_context.drawImage(canvas, 0, 0);
 			
 			// cleanup
@@ -338,7 +332,7 @@ define(['dojo/dom',
 		 */
 		handleParamChange = function() {
 			data.changed = true;
-			generate();
+			dom.byId(config.control.generate_id).disabled = false;
 		},
 		
 		/**
@@ -356,12 +350,30 @@ define(['dojo/dom',
 			
 			dom.byId(config.control.select_id).click();
 		},
+				
+		/**
+		 * generate the preview canvas
+		 * @returns void
+		 */
+		handleGenerate = function() {
+			if(!data.staticImage) {
+				loadStaticImage(generate);
+				return;
+			}
+			
+			generate();
+		},
 		
 		/**
-		 * save a png of the configured canvas element
+		 * save a full-resolution png of the configured canvas element
 		 * @returns void
 		 */		
 		handleSave = function() {
+			if(!data.staticImage) {
+				loadStaticImage(handleSave);
+				return;
+			}
+			
 			// google analytics event
 			ga('send', {
 				hitType: 'event',
@@ -393,8 +405,6 @@ define(['dojo/dom',
 			
 		return {
 			Init: function() {
-				loadStaticImage();
-				
 				on(dom.byId(config.control.select_id), 'change', loadUserImage);
 				on(dom.byId(config.form_id)['smoothing'], 'change', handleParamChange);
 				on(dom.byId(config.form_id)['blendmode'], 'change', handleParamChange);
@@ -403,7 +413,18 @@ define(['dojo/dom',
 				on(dom.byId(config.form_id)['size'][0], 'change', handleParamChange);
 				on(dom.byId(config.form_id)['size'][1], 'change', handleParamChange);
 				on(dom.byId(config.form_id)['matte'], 'change', handleParamChange);
+				on(dom.byId(config.control.generate_id), 'click', handleGenerate);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
+				
+				// initial click
+				var imageListener = on(dom.byId(config.canvasContainer_id), 'click', function() {
+					imageListener.remove();
+					dom.byId(config.control.select_id).click();
+				});
+				
+				// disable generate / save
+				dom.byId(config.control.generate_id).disabled = true;
+				dom.byId(config.control.save_id).disabled = true;
 				
 				console.log('iFoE Generator Init Complete.');
 			}

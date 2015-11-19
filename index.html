@@ -138,11 +138,14 @@ performance or use of this material.
 				<div class="control_group">
 					<h3>Options</h3>
 					<div class="control flex2col">
-						<span class="prompt">Fit Image :</span><input name="size" type="radio" value="user"/>
-						<span class="prompt">900px x 600px :</span><input name="size" type="radio" value="flag" checked/>
+						<span class="prompt">Fit Image :</span><input name="size" type="radio" value="user" checked/>
+						<span class="prompt">900px &middot; 600px :</span><input name="size" type="radio" value="flag"/>
 						<span class="prompt">Smoothing :</span><input name="smoothing" type="checkbox" value="true" checked/>
 						<span class="prompt">Blue Matte :</span><input name="matte" type="checkbox" value="true" checked/>
 					</div>
+				</div>
+				<div class="control">
+					<button id="control_image_generate" type="button">Apply</button>
 				</div>
 				<div class="control">
 					<button id="control_image_save" type="button">Save</button>
