@@ -23,39 +23,31 @@ performance or use of this material.
     Author     : Build 82 <courier@build82.com>
 */
 
+
+// default
+body>div .responsive {
+	width: 100%;
+}
+
 // large
-@media (max-width: 1100px) {
-	.articleImage_large>div img, .articleImage_large>div canvas {
-		width: 99%;
+@media (max-width: 900px) {
+	#canvasContainer {
+		width: 100%;
+		height: auto;
+		max-height: 600px;
 	}
 }
 
 // medium
-@media (max-width: 890px) {
-	.articleImage_medium>div img, .articleImage_medium>div canvas {
-		width: 99%;
-	}
-	
+@media (max-width: 800px) {
 	body>div h4 {
 		font-size: 80%;
-	}
-	
-	article ul li {
-		width: 49%;
 	}
 }
 
 // small
 @media (max-width: 600px) {
-	.articleImage_small>div img, .articleImage_small>div canvas {
-		width: 99%;
-	}
-	
 	body>div h4 {
 		font-size: 70%;
-	}
-	
-	article ul li {
-		width: 99%;
 	}
 }

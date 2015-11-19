@@ -25,19 +25,19 @@ performance or use of this material.
 -->
 <html>
 <head>
-	<title>International Flag of the Earth : #HealTheWorld #SpreadLove #iFoE</title>
+	<title>International Flag of Earth : Image Generator - #HealTheWorld #SpreadLove #iFoE</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta property="og:url" content="http://ifoe.build82.com"/>
 	<meta property="og:image" content="http://ifoe.build82.com/images/ifoe_static.png"/>
-	<meta property="og:title" content="International Flag of the Earth : Image Generator"/>
+	<meta property="og:title" content="International Flag of Earth : Image Generator"/>
 	<meta property="og:description" content="Support planetary solidarity. Overlay the 'International Flag of Planet Earth' onto any image."/>
 	<meta property="og:type" content="website" />
 
 	<meta name="twitter:card" content="summary_large_image"/>
 	<meta name="twitter:site" content="http://ifoe.build82.com/"/>
 	<meta name="twitter:creator" content="@build82"/>
-	<meta name="twitter:title" content="International Flag of Earth - Image Generator">
+	<meta name="twitter:title" content="International Flag of Earth : Image Generator">
 	<meta name="twitter:description" content="Support planetary solidarity. Overlay the 'International Flag of Planet Earth' onto any image."/>
 	<meta name="twitter:image" content="http://ifoe.build82.com/images/ifoe_static.png" />
 
@@ -51,17 +51,17 @@ performance or use of this material.
 	<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/tundra/tundra.css">
 
 	<script>
-		require(['ifoe/menu', 'ifoe/generator', 'build82/fb', 'build82/twitter', 'ifoe/interface', 'dojo/domReady!'], function (menu, generator, fb) {
+		require(['ifoe/menu', 'ifoe/generator', 'build82/fb', 'build82/twitter', 'dojo/domReady!'], function (menu, generator) {
 			menu.Init();
 			generator.Init();
 		});
 	</script>
 </head>
-<body class="tundra articleImage_large">
+<body class="tundra">
 	<header>
 		<div id="menu">
 			<span class="left"><span class="anchor"><span class="icon"></span></span></span>
-			<span class="title">International Flag of the Planet Earth</span>
+			<span class="title">International Flag of Earth</span>
 			<span class="hashtags">#HealTheWorld #SpreadLove #iFoE</span>
 		</div>
 	</header>
@@ -70,55 +70,89 @@ performance or use of this material.
 		<div id="link_list"></div>
 	</nav>
 	<div id="hero">
-		<canvas id="image_result" width="900" height="600"></canvas>
+		<div id="canvasContainer">
+			<img src="images/ifoe_static.png" class="responsive"/>
+		</div>
 		<div class="attribution">
-			"International Flag of Planet Earth" by Oskar Pernefeldt - <a href="http://www.flagofplanetearth.com">http://www.flagofplanetearth.com</a>
+			Overlay : "International Flag of Planet Earth" by Oskar Pernefeldt - <a href="http://www.flagofplanetearth.com">http://www.flagofplanetearth.com</a>
 		</div>
 		<div class="controls">
-			<div class="control">
-				Select a file (or click image) : <input type="file" id="control_image_selector" accept="image/*"/>
-			</div>
-			<hr/>
-			<div class="control">
-				Tweak this (blend mode) : <select id="control_image_blend_mode">
-					<option value="source-over" selected>No Blend</option>
-					<option value="multiply">Multiply</option>
-					<option value="overlay">Overlay</option>
-					<option value="screen">Screen</option>
-					<option value="lighten">Lighten</option>
-					<option value="darken">Darken</option>
-					<option value="hard-light">Hard-Light</option>
-					<option value="soft-light">Soft-Light</option>
-					<option value="hue">Hue</option>
-					<option value="color">Color</option>
-					<option value="color-burn">Color Burn</option>
-					<option value="luminosity">Luminosity</option>
-					<option value="difference">Difference</option>
-					<option value="exclusion">Exclusion</option>
-				</select>
-			</div>
-			<div class="control">
-				&hellip; and this (overlay opacity) : <select id="control_image_opacity">
-					<option value="100">100%</option>
-					<option value="90">90%</option>
-					<option value="80">80%</option>
-					<option value="70">70%</option>
-					<option value="60">60%</option>
-					<option value="50">50%</option>
-					<option value="40">40%</option>
-					<option value="30">30%</option>
-					<option value="20">20%</option>
-					<option value="10">10%</option>
-				</select>
-			</div>
-			<div class="control">
-				Looks good? : <button id="control_image_save">Save Image</button>
-			</div>
+			<form id="control_form">
+				<div class="control_group">
+					<h3>Background</h3>
+					<div class="control">
+						<input type="file" id="control_image_selector" accept="image/*"/>
+					</div>
+				</div>
+				<div class="control_group">
+					<h3>Settings</h3>
+					<div class="control">
+						Blend Mode : <select name="blendmode">
+							<option value="source-over" selected>No Blend</option>
+							<option value="multiply">Multiply</option>
+							<option value="overlay">Overlay</option>
+							<option value="screen">Screen</option>
+							<option value="lighten">Lighten</option>
+							<option value="darken">Darken</option>
+							<option value="hard-light">Hard-Light</option>
+							<option value="soft-light">Soft-Light</option>
+							<option value="hue">Hue</option>
+							<option value="color">Color</option>
+							<option value="color-burn">Color Burn</option>
+							<option value="luminosity">Luminosity</option>
+							<option value="difference">Difference</option>
+							<option value="exclusion">Exclusion</option>
+						</select>
+					</div>
+					<div class="control">
+						Overlay Scale : <select name="scale">
+							<option value="100">100%</option>
+							<option value="90">90%</option>
+							<option value="80">80%</option>
+							<option value="70" selected>70%</option>
+							<option value="60">60%</option>
+							<option value="50">50%</option>
+							<option value="40">40%</option>
+							<option value="30">30%</option>
+							<option value="20">20%</option>
+							<option value="10">10%</option>
+							<option value="5">5%</option>
+						</select>
+					</div>
+					<div class="control">
+						Overlay Opacity : <select name="opacity">
+							<option value="100">100%</option>
+							<option value="90">90%</option>
+							<option value="80">80%</option>
+							<option value="70">70%</option>
+							<option value="60">60%</option>
+							<option value="50">50%</option>
+							<option value="40">40%</option>
+							<option value="30">30%</option>
+							<option value="20">20%</option>
+							<option value="10">10%</option>
+							<option value="5">5%</option>
+						</select>
+					</div>
+				</div>
+				<div class="control_group">
+					<h3>Options</h3>
+					<div class="control flex2col">
+						<span class="prompt">Fit Image :</span><input name="size" type="radio" value="user"/>
+						<span class="prompt">900px x 600px :</span><input name="size" type="radio" value="flag" checked/>
+						<span class="prompt">Smoothing :</span><input name="smoothing" type="checkbox" value="true" checked/>
+						<span class="prompt">Blue Matte :</span><input name="matte" type="checkbox" value="true" checked/>
+					</div>
+				</div>
+				<div class="control">
+					<button id="control_image_save" type="button">Save</button>
+				</div>
+			</form>
 		</div>
 	</div>
 	<div id="boilerplate">
 		<div class="fb-like" data-href="http://ifoe.build82.com/" data-layout="button_count" data-action="like" data-width="350" data-show-faces="true" data-share="true"></div>
-		<div><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://ifoe.build82.com" data-text="International Flag of Planet Earth : Support planetary solidarity." data-hashtags="HealTheWorld,SpreadLove,iFoE">Tweet</a></div>
+		<div><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://ifoe.build82.com" data-text="International Flag of Earth : Support planetary solidarity." data-hashtags="HealTheWorld,SpreadLove,iFoE"></a></div>
 	</div>
 	<footer>
 		<p>
