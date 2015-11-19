@@ -20,21 +20,32 @@
  */
 
 define(['dojo/dom',
+		'dojo/dom-construct',
+		'dojo/dom-class',
         'dojo/on',
+		'dojo/_base/fx',
 		'build82/reimg'
         ], 
-    function(dom, on, reimg) {
+    function(dom, domConstruct, domClass, on, baseFx, reimg) {
 		var config = {
-			canvas_id: 'image_result',
-			staticImage_url: 'images/ifoe_static.png',
-			control: {
-				select_id: 'control_image_selector',
-				opacity_id: 'control_image_opacity',
-				blendmode_id: 'control_image_blend_mode',
-				save_id: 'control_image_save'
-			}
+			interface_id: 'hero',						// element to fade in & out with redraw
+			interfaceRefreshDuration: 5000,				// total fade duration (ms)
+			canvasContainer_id: 'canvasContainer',		// element to create canvases in
+			staticImage_url: 'images/ifoe_white.png',	// transparent with white graphic
+			defaultSize: {								// default size
+				width: 900,
+				height: 600
+			},
+			control: {									
+				select_id: 'control_image_selector',	// file select element
+				save_id: 'control_image_save'			// save button
+			},
+			form_id: 'control_form'						// form with "blendmode", "opacity", and "size"
 		},
 		data = {
+			canvas: null,
+			canvasListener: null,
+			scrollPosition: null,
 			staticImage: null,
 			userImage: null,
 			changed: false
@@ -63,8 +74,8 @@ define(['dojo/dom',
 		 * @returns void
 		 */
 		loadUserImage = function(param_evt) {
-			for(var i = 0; i < param_evt.srcElement.files.length; i++) {
-				var file = param_evt.srcElement.files[i];
+			for(var i = 0; i < param_evt.target.files.length; i++) {
+				var file = param_evt.target.files[i];
 
 				data.userImage = new Image();
 				var reader = new FileReader();
@@ -73,7 +84,7 @@ define(['dojo/dom',
 					setTimeout(function(){
 						generate();
 						inputDisable(false);
-					}, 1);
+					}, 10);
 				}
 				
 				inputDisable(true);
@@ -88,9 +99,13 @@ define(['dojo/dom',
 		 */
 		inputDisable = function(param_disabled_bool) {
 			dom.byId(config.control.select_id).disabled = param_disabled_bool;
-			dom.byId(config.control.blendmode_id).disabled = param_disabled_bool;
-			dom.byId(config.control.opacity_id).disabled = param_disabled_bool;
 			dom.byId(config.control.save_id).disabled = param_disabled_bool;
+			dom.byId(config.form_id)['blendmode'].disabled = param_disabled_bool;
+			dom.byId(config.form_id)['opacity'].disabled = param_disabled_bool;
+			dom.byId(config.form_id)['size'].disabled = param_disabled_bool;
+			dom.byId(config.form_id)['scale'].disabled = param_disabled_bool;
+			dom.byId(config.form_id)['smoothing'].disabled = param_disabled_bool;
+			dom.byId(config.form_id)['matte'].disabled = param_disabled_bool;
 			
 			if(param_disabled_bool) {
 				document.body.style.cursor = "wait";
@@ -112,39 +127,157 @@ define(['dojo/dom',
 				hitType: 'event',
 				eventCategory: 'Processing',
 				eventAction: 'generate',
-				eventLabel: 'blendmode:'+dom.byId(config.control.blendmode_id).value+' opacity:'+dom.byId(config.control.opacity_id).value
+				eventLabel: 'blendmode:'+dom.byId(config.form_id)['blendmode'].value+
+							' opacity:'+dom.byId(config.form_id)['opacity'].value+
+							' smoothing:'+dom.byId(config.form_id)['smoothing'].checked
 			});
-			
+
 			// default suggestion
 			if(!data.changed) {
-				dom.byId(config.control.blendmode_id).value = "hard-light";
-				dom.byId(config.control.opacity_id).value = "70";
+				dom.byId(config.form_id)['blendmode'].value = "hard-light";
+				dom.byId(config.form_id)['opacity'].value = "40";
 				data.changed = true;
 			}
 			
-			var canvas = document.getElementById(config.canvas_id);
-			var ctx = canvas.getContext("2d");
-			ctx.mozImageSmoothingEnabled = false;
-			ctx.msImageSmoothingEnabled = false;
-			ctx.imageSmoothingEnabled = false;
-			ctx.globalCompositeOperation = "source-over";
-			ctx.globalAlpha = 1;
+			// create drawing context (prevent dom jump)
+			saveScrollPosition();
+			destroyOldContext();
+			var ctx = createPreviewContext();
+			redrawBrowser();
 			
-			// clear canvas (white background)
-			ctx.fillStyle = "#FFFFFF";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			
+			// draw images
 			if(data.userImage) {
-				centerImage(ctx, data.userImage);
+				centerImage(ctx, data.userImage, null, 100);
 			}
 			
 			if(data.staticImage) {
-				ctx.globalAlpha = dom.byId(config.control.opacity_id).value / 100;
-				ctx.globalCompositeOperation = dom.byId(config.control.blendmode_id).value;
-				centerImage(ctx, data.staticImage);
+				ctx.globalAlpha = dom.byId(config.form_id)['opacity'].value / 100;
+				ctx.globalCompositeOperation = dom.byId(config.form_id)['blendmode'].value;
+				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
+				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value);
 			}
 			
 			inputDisable(false);
+		},
+				
+		saveScrollPosition = function() {
+			data.scrollPosition = {
+				x: window.scrollX,
+				y: window.scrollY
+			};
+		};
+		
+		restoreScrollPosition = function() {
+			window.scroll(data.scrollPosition.x, data.scrollPosition.y);
+		},
+				
+		destroyOldContext = function() {
+			if(data.canvas) {
+				domConstruct.destroy(data.canvas);
+				delete data.canvas;
+				data.canvasListener.remove();
+				data.canvasListener = null;
+			}
+			
+			dom.byId(config.canvasContainer_id).innerHTML = null;
+		},
+		
+		createPreviewContext = function() {
+			data.canvas = domConstruct.create('canvas');
+			data.canvas.className = "responsive";
+			domConstruct.place(data.canvas, config.canvasContainer_id, "first");
+			data.canvasListener = on(data.canvas, 'click', handleImageClick);
+			
+			// set size
+			if(dom.byId(config.form_id)['size'].value == "user" && data.userImage) {
+				var container = {
+					width: dom.byId(config.canvasContainer_id).offsetWidth,
+					height: config.defaultSize.height
+				};
+				
+				if(data.userImage.height < container.height && data.userImage.width < container.width) {
+					// smaller than flag
+					data.canvas.className = "";
+					data.canvas.height = data.userImage.height;
+					data.canvas.width = data.userImage.width;
+				}
+				else {
+					// assume wide image
+					data.canvas.width = container.width;
+					data.canvas.height = data.userImage.height * (container.width/data.userImage.width);
+
+					if(data.canvas.height > container.height) {
+						data.canvas.className = "";
+						data.canvas.height = container.height;
+						data.canvas.width = data.userImage.width * (container.height/data.userImage.height);
+					}
+				}
+			}
+			else {
+				data.canvas.width = config.defaultSize.width;
+				data.canvas.height = config.defaultSize.height;
+			}
+			
+			// setup context & smoothing
+			var ctx = data.canvas.getContext("2d");
+			ctx.globalCompositeOperation = "source-over";
+			ctx.globalAlpha = 1;
+			ctx.mozImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			ctx.msImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			ctx.imageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			
+			return ctx;
+		},
+				
+		createFinalContext = function() {
+			var canvas = domConstruct.create('canvas');
+			
+			// set size
+			if(dom.byId(config.form_id)['size'].value == "user" && data.userImage) {
+				canvas.height = data.userImage.height;
+				canvas.width = data.userImage.width;
+			}
+			else {
+				canvas.height = config.defaultSize.height;
+				canvas.width = config.defaultSize.width;
+			}
+			
+			// setup context & smoothing
+			var ctx = canvas.getContext("2d");
+			ctx.mozImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			ctx.msImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			ctx.imageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			
+			return ctx;
+		},
+			
+		// refresh dom to fix Chrome display bug
+		redrawBrowser = function() {
+			var element = dom.byId(config.interface_id);
+			var n = document.createTextNode(' ');
+			var disp = element.style.display;  // don't worry about previous display style
+			
+			// fade out
+			baseFx.fadeOut({
+				node: element,
+				duration: config.interfaceRefreshDuration/2,
+				end: function() {
+					element.appendChild(n);
+					element.style.display = 'none';
+
+					setTimeout(function(){
+						element.style.display = disp;
+						n.parentNode.removeChild(n);
+						restoreScrollPosition();
+
+						// fade in
+						baseFx.fadeIn({
+							node: element,
+							duration: config.interfaceRefreshDuration/2
+						}).play();
+					}, 1); // you can play with this timeout to make it as short as possible
+				}
+			}).play();
 		},
 		
 		/**
@@ -153,7 +286,7 @@ define(['dojo/dom',
 		 * @param param_image image data to draw centered onto context
 		 * @returns void
 		 */
-		centerImage = function(param_context, param_image) {
+		centerImage = function(param_context, param_image, param_matte, param_scale) {
 			var scaled = {width:null, height:null};
 			if(param_context.canvas.height >= param_context.canvas.width) {
 				// tall canvas
@@ -166,12 +299,37 @@ define(['dojo/dom',
 				scaled.width = param_image.width * scaled.height/param_image.height;
 			}
 			
+			// apply user scale
+			scaled.height *= param_scale/100;
+			scaled.width *= param_scale/100;
+			
 			var offset = {
 				x: param_context.canvas.width/2 - scaled.width/2,
 				y: param_context.canvas.height/2 - scaled.height/2
 			};
 			
-			param_context.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
+			// draw on matte
+			// setup context & smoothing
+			var canvas = domConstruct.create('canvas');
+			canvas.width = param_context.canvas.width;
+			canvas.height = param_context.canvas.height;
+			var ctx = canvas.getContext("2d");
+			ctx.mozImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			ctx.msImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			ctx.imageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			if(param_matte) {
+				ctx.fillStyle = param_matte;
+				ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			}
+			ctx.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
+			
+			// draw on context
+			param_context.drawImage(canvas, 0, 0);
+			
+			// cleanup
+			domConstruct.destroy(canvas);
+			delete ctx;
+			delete canvas;
 		},
 				
 		/**
@@ -209,10 +367,28 @@ define(['dojo/dom',
 				hitType: 'event',
 				eventCategory: 'Processing',
 				eventAction: 'save',
-				eventLabel: 'blendmode:'+dom.byId(config.control.blendmode_id).value+' opacity:'+dom.byId(config.control.opacity_id).value
+				eventLabel: 'blendmode:'+dom.byId(config.form_id)['blendmode'].value+
+							' opacity:'+dom.byId(config.form_id)['opacity'].value+
+							' smoothing:'+dom.byId(config.form_id)['smoothing'].checked
 			});
 			
-			reimg.fromCanvas(dom.byId(config.canvas_id)).downloadPng();
+			inputDisable(true);
+			var ctx = createFinalContext();
+			if(data.userImage) {
+				centerImage(ctx, data.userImage, null, 100);
+			}
+			if(data.staticImage) {
+				ctx.globalAlpha = dom.byId(config.form_id)['opacity'].value / 100;
+				ctx.globalCompositeOperation = dom.byId(config.form_id)['blendmode'].value;
+				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
+				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value);
+			}
+			reimg.fromCanvas(ctx.canvas).downloadPng();
+			inputDisable(false);
+			
+			// cleanup
+			domConstruct.destroy(ctx.canvas);
+			delete ctx;
 		};
 			
 		return {
@@ -220,10 +396,14 @@ define(['dojo/dom',
 				loadStaticImage();
 				
 				on(dom.byId(config.control.select_id), 'change', loadUserImage);
-				on(dom.byId(config.control.blendmode_id), 'change', handleParamChange);
-				on(dom.byId(config.control.opacity_id), 'change', handleParamChange);
+				on(dom.byId(config.form_id)['smoothing'], 'change', handleParamChange);
+				on(dom.byId(config.form_id)['blendmode'], 'change', handleParamChange);
+				on(dom.byId(config.form_id)['opacity'], 'change', handleParamChange);
+				on(dom.byId(config.form_id)['scale'], 'change', handleParamChange);
+				on(dom.byId(config.form_id)['size'][0], 'change', handleParamChange);
+				on(dom.byId(config.form_id)['size'][1], 'change', handleParamChange);
+				on(dom.byId(config.form_id)['matte'], 'change', handleParamChange);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
-				on(dom.byId(config.canvas_id), 'click', handleImageClick);
 				
 				console.log('iFoE Generator Init Complete.');
 			}
