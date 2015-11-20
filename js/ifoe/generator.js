@@ -24,9 +24,10 @@ define(['dojo/dom',
 		'dojo/dom-class',
         'dojo/on',
 		'dojo/_base/fx',
+		'build82/ga',
 		'build82/reimg'
         ], 
-    function(dom, domConstruct, domClass, on, baseFx, reimg) {
+    function(dom, domConstruct, domClass, on, baseFx, ga, reimg) {
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
