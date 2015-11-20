@@ -135,7 +135,7 @@ define(['dojo/dom',
 				data.changed = true;
 			}
 			
-			// create drawing context (prevent dom jump)
+			// create drawing context & trigger redraw
 			destroyOldContext();
 			var ctx = createPreviewContext();
 			redrawBrowser();
@@ -394,7 +394,7 @@ define(['dojo/dom',
 				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
 				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value, dom.byId(config.form_id)['blendmode'].value, dom.byId(config.form_id)['opacity'].value);
 			}
-			reimg.fromCanvas(ctx.canvas).downloadPng();
+			reimg.fromCanvas(ctx.canvas).downloadPng('flag_of_earth');
 			inputDisable(false);
 			
 			// cleanup
