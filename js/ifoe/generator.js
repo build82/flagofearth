@@ -46,6 +46,7 @@ define(['dojo/dom',
 		data = {
 			canvas: null,
 			canvasListener: null,
+			
 			staticImage: null,
 			userImage: null,
 			changed: false
@@ -397,6 +398,7 @@ define(['dojo/dom',
 			
 			inputDisable(true);
 			var ctx = createFinalContext();
+			
 			if(data.userImage) {
 				centerImage(ctx, data.userImage, null, 100, "source-over", 100);
 			}
