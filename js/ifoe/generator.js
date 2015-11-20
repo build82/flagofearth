@@ -31,7 +31,7 @@ define(['dojo/dom',
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
-			staticImage_url: 'images/ifoe_white.png',	// transparent with white graphic
+			staticImage_url: 'images/ifoe_white.svg',	// transparent with white graphic
 			defaultSize: {								// default size
 				width: 900,
 				height: 600
