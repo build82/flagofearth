@@ -1,4 +1,4 @@
-define(['https://platform.twitter.com/widgets.js'
+define(['//platform.twitter.com/widgets.js'
         ],
     function() {
 		window.twttr = {};

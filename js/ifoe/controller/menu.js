@@ -31,8 +31,8 @@ define(['dojo/query',
 		'dojo/dom-style',
         'dojo/on',
         'dojo/_base/array',
-		'ifoe/config',
-		'ifoe/menuitem'
+		'ifoe/controller/config',
+		'ifoe/controller/menuitem'
         ], 
     function(query, baseFx, fx, easing, aspect, nld, dom, domConstruct, domClass, domStyle, on, baseArray,
 		Config, MenuItem) {

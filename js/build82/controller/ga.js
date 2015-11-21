@@ -1,4 +1,4 @@
-define(['https://www.google-analytics.com/analytics.js'
+define(['//www.google-analytics.com/analytics.js'
         ],
     function() {
 		window['GoogleAnalyticsObject'] = 'ga',  

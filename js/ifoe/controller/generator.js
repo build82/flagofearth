@@ -24,8 +24,8 @@ define(['dojo/dom',
 		'dojo/dom-class',
         'dojo/on',
 		'dojo/_base/fx',
-		'build82/ga',
-		'build82/reimg'
+		'build82/controller/ga',
+		'build82/utility/reimg'
         ], 
     function(dom, domConstruct, domClass, on, baseFx, ga, reimg) {
 		var config = {

@@ -1,4 +1,4 @@
-define(['https://connect.facebook.net/en_US/sdk.js'
+define(['//connect.facebook.net/en_US/sdk.js'
         ],
     function() {
         FB.init({

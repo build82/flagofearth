@@ -28,5 +28,11 @@ var dojoConfig = {
 	},{
 		name: "build82",
 		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/build82'
+	},{
+		name: "dojo",
+		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/dojo'
+	},{
+		name: "dojox",
+		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/dojox'
 	}]
 };

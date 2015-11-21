@@ -1,4 +1,4 @@
-define('build82/reimg', function() {
+define(function() {
 	var OutputProcessor = function(encodedData, element) {
 		var isPng = function() {
 			return encodedData.indexOf('data:image/png') === 0;
