@@ -139,8 +139,8 @@ define(['dojo/dom',
 			}
 			
 			// create drawing context & trigger redraw
-			destroyOldContext();
-			var ctx = createPreviewContext();
+			destroyContext();
+			var ctx = createContext();
 			redrawBrowser();
 			
 			// draw images
@@ -161,7 +161,7 @@ define(['dojo/dom',
 		 * remove preview canvas
 		 * @returns void
 		 */
-		destroyOldContext = function() {
+		destroyContext = function() {
 			if(data.canvas) {
 				domConstruct.destroy(data.canvas);
 				delete data.canvas;
@@ -179,7 +179,7 @@ define(['dojo/dom',
 		 * prepare previw canvas
 		 * @returns void
 		 */
-		createPreviewContext = function() {
+		createContext = function() {
 			data.canvas = domConstruct.create('canvas');
 			data.canvas.className = "responsive";
 			domConstruct.place(data.canvas, config.canvasContainer_id, "first");
@@ -187,27 +187,20 @@ define(['dojo/dom',
 			
 			// set size
 			if(dom.byId(config.form_id)['size'].value == "user" && data.userImage) {
+				data.canvas.height = data.userImage.height;
+				data.canvas.width = data.userImage.width;		
+
 				var container = {
 					width: dom.byId(config.canvasContainer_id).offsetWidth,
 					height: config.defaultSize.height
 				};
 				
+				// smaller than container ?
 				if(data.userImage.height < container.height && data.userImage.width < container.width) {
-					// smaller than flag
 					data.canvas.className = "";
-					data.canvas.height = data.userImage.height;
-					data.canvas.width = data.userImage.width;
 				}
-				else {
-					// assume wide image
-					data.canvas.width = container.width;
-					data.canvas.height = data.userImage.height * (container.width/data.userImage.width);
-
-					if(data.canvas.height > container.height) {
-						data.canvas.className = "";
-						data.canvas.height = container.height;
-						data.canvas.width = data.userImage.width * (container.height/data.userImage.height);
-					}
+				else if(data.userImage.height >= data.userImage.width) {
+					data.canvas.className = "";
 				}
 			}
 			else {
@@ -225,49 +218,22 @@ define(['dojo/dom',
 		},
 			
 		/**
-		 * prepare final export canvas
-		 * @returns void
-		 */
-		createFinalContext = function() {
-			var canvas = domConstruct.create('canvas');
-			
-			// set size
-			if(dom.byId(config.form_id)['size'].value == "user" && data.userImage) {
-				canvas.height = data.userImage.height;
-				canvas.width = data.userImage.width;
-			}
-			else {
-				canvas.height = config.defaultSize.height;
-				canvas.width = config.defaultSize.width;
-			}
-			
-			// setup context & smoothing
-			var ctx = canvas.getContext("2d");
-			ctx.mozImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
-			ctx.msImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
-			ctx.imageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
-			
-			return ctx;
-		},
-			
-		/**
 		 * force browser refresh to fix Chrome display bug
 		 * @returns void
 		 */
 		redrawBrowser = function() {
 			var element = dom.byId(config.interface_id);
-			var n = document.createTextNode(' ');
-			var disp = element.style.display;  // don't worry about previous display style
+			var node = document.createTextNode(' ');
+			var display = element.style.display;
 			
-			// fade out
-			element.appendChild(n);
+			element.appendChild(node);
 			element.style.display = 'none';
 
 			setTimeout(function(){
-				element.style.display = disp;
-				n.parentNode.removeChild(n);
+				element.style.display = display;
+				node.parentNode.removeChild(node);
 				window.scroll(0, 0);
-			}, 1); // you can play with this timeout to make it as short as possible
+			}, 1);
 		},
 		
 		/**
@@ -348,6 +314,7 @@ define(['dojo/dom',
 		handleParamChange = function() {
 			data.changed = true;
 			dom.byId(config.control.generate_id).disabled = false;
+			dom.byId(config.control.save_id).disabled = false;
 		},
 		
 		/**
@@ -384,11 +351,6 @@ define(['dojo/dom',
 		 * @returns void
 		 */		
 		handleSave = function() {
-			if(!data.staticImage) {
-				loadStaticImage(handleSave);
-				return;
-			}
-			
 			// google analytics event
 			ga('send', {
 				hitType: 'event',
@@ -399,22 +361,7 @@ define(['dojo/dom',
 							' smoothing:'+dom.byId(config.form_id)['smoothing'].checked
 			});
 			
-			inputDisable(true);
-			var ctx = createFinalContext();
-			
-			if(data.userImage) {
-				centerImage(ctx, data.userImage, null, 100, "source-over", 100);
-			}
-			if(data.staticImage) {
-				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
-				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value, dom.byId(config.form_id)['blendmode'].value, dom.byId(config.form_id)['opacity'].value);
-			}
-			reimg.fromCanvas(ctx.canvas).downloadPng('flag_of_earth');
-			inputDisable(false);
-			
-			// cleanup
-			domConstruct.destroy(ctx.canvas);
-			delete ctx;
+			reimg.fromCanvas(data.canvas).downloadPng('flag_of_earth');
 		};
 			
 		return {
@@ -431,10 +378,6 @@ define(['dojo/dom',
 				on(dom.byId(config.form_id)['matte'], 'change', handleParamChange);
 				on(dom.byId(config.control.generate_id), 'click', handleGenerate);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
-				
-				// disable generate / save
-				dom.byId(config.control.generate_id).disabled = true;
-				dom.byId(config.control.save_id).disabled = true;
 				
 				console.log('iFoE Generator Init Complete.');
 			}

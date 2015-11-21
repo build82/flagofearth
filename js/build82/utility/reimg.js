@@ -13,7 +13,6 @@ define(function() {
 			a.download = filename;
 			document.body.appendChild(a);
 			a.click();
-			
 		};
 
 		return {
