@@ -1,4 +1,4 @@
-define('build82/context_blender', function() {
+define(function() {
 	var defaultOffsets = {
 		destX   : 0,
 		destY   : 0,

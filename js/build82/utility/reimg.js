@@ -1,7 +1,10 @@
-define('build82/reimg', function() {
-	var OutputProcessor = function(encodedData, svgElement) {
+define(function() {
+	var OutputProcessor = function(encodedData, element) {
 		var isPng = function() {
 			return encodedData.indexOf('data:image/png') === 0;
+		};
+		var isJpg = function() {
+			return encodedData.indexOf('data:image/jpeg') === 0;
 		};
 
 		var downloadImage = function(data, filename) {
@@ -10,6 +13,7 @@ define('build82/reimg', function() {
 			a.download = filename;
 			document.body.appendChild(a);
 			a.click();
+			
 		};
 
 		return {
@@ -23,7 +27,7 @@ define('build82/reimg', function() {
 			},
 			toCanvas: function(callback) {
 				var canvas = document.createElement('canvas');
-				var boundedRect = svgElement.getBoundingClientRect();
+				var boundedRect = element.getBoundingClientRect();
 				canvas.width = boundedRect.width;
 				canvas.height = boundedRect.height;
 				var canvasCtx = canvas.getContext('2d');
@@ -49,26 +53,38 @@ define('build82/reimg', function() {
 			},
 			toJpeg: function(quality) { // quality should be between 0-1
 				quality = quality || 1.0;
-				(function(q) {
-					this.toCanvas(function(canvas) {
-						var img = document.createElement('img');
-						img.src = canvas.toDataURL('image/jpeg', q);
-						return img;
-					});
-				})(quality);
+				
+				this.toCanvas(function(canvas) {
+					var img = document.createElement('img');
+					img.src = canvas.toDataURL('image/jpeg', quality);
+					return img;
+				});
 			},
-			downloadPng: function() {
+			downloadPng: function(filename) {
 				if (isPng()) {
-					// it's a canvas already
-					downloadImage(encodedData, 'flag_of_earth.png');
+					// it's a data url already
+					downloadImage(encodedData, filename+'.png');
 					return;
 				}
 
-				// convert to canvas first
+				// convert to data url first
 				this.toCanvas(function(canvas) {
-					downloadImage(canvas.toDataURL(), 'flag_of_earth.png');
+					downloadImage(canvas.toDataURL(), filename+'.png');
 				});
-			}
+			},
+			downloadJpg: function(filename, quality) {
+				quality = quality || 1.0;
+				if (isJpg()) {
+					// it's a data url already
+					downloadImage(encodedData, filename+'.jpg');
+					return;
+				}
+
+				// convert to data url first
+				this.toCanvas(function(canvas) {
+					downloadImage(canvas.toDataURL('image/jpeg', quality), filename+'.jpg');
+				});
+			},
 		};
 	};
 
@@ -80,7 +96,7 @@ define('build82/reimg', function() {
 
 		fromCanvas: function(canvasElement) {
 			var dataUrl = canvasElement.toDataURL();
-			return new OutputProcessor(dataUrl);
+			return new OutputProcessor(dataUrl, canvasElement);
 		}
 	};
 });

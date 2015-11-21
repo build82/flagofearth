@@ -1,0 +1,10 @@
+{
+	"name": "ifoe",
+	"version":"1.0",
+	"dependencies": {
+		"dojo":"1.10.4",
+		"dijit":"1.10.4"
+	},
+	"description": "iFoE Application",
+	"dojoBuild": "ifoe.profile.js"
+}

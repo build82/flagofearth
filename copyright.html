@@ -51,8 +51,11 @@ performance or use of this material.
 	<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/tundra/tundra.css">
 	
 	<script>
-		require(['ifoe/menu', 'dojo/domReady!'], function (menu) {
+		require(['ifoe/menu', 'build82/ga', dojo/domReady!'], function (menu, ga) {
             menu.Init();
+			
+			ga('create', 'UA-60731983-2', 'auto');
+			ga('send', 'pageview');
         });
     </script>
 </head>

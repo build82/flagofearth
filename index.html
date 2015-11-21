@@ -46,14 +46,17 @@ performance or use of this material.
 	<link rel="copyright" title="iFoE Copyright" href="copyright.html"/>
 	<link rel="author" href="mailto:courier@build82.com"/>
 	<script type="text/javascript" src="js/flagofearth.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
+	<script type="text/javascript" src="js/dojo/dojo.js"></script>
 	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css"> 
 	<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/tundra/tundra.css">
 
 	<script>
-		require(['ifoe/menu', 'ifoe/generator', 'build82/fb', 'build82/twitter', 'dojo/domReady!'], function (menu, generator) {
+		require(['ifoe/controller/menu', 'ifoe/controller/generator', 'build82/controller/ga', 'build82/controller/fb', 'build82/controller/twitter', 'dojo/domReady!'], function (menu, generator, ga) {
 			menu.Init();
 			generator.Init();
+			
+			ga('create', 'UA-60731983-2', 'auto');
+			ga('send', 'pageview');
 		});
 	</script>
 </head>

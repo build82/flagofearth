@@ -25,10 +25,10 @@ define(['dojo/_base/declare',
 		'dojo/on',
 		'dijit/_Widget', 
 		'dijit/_Templated',
-		'ifoe/config',
+		'ifoe/controller/config',
 		], 
     function(declare, baseArray, domConstruct, on, _Widget, _Templated, Config) {
-		return declare('build82.menuitem', [_Widget, _Templated], {
+		return declare('ifoe.controller..menuitem', [_Widget, _Templated], {
 			name: '',
 			url: '',
 			type: '',

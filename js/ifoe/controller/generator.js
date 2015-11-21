@@ -24,14 +24,15 @@ define(['dojo/dom',
 		'dojo/dom-class',
         'dojo/on',
 		'dojo/_base/fx',
-		'build82/reimg',
-		'build82/context_blender'
+		'build82/controller/ga',
+		'build82/utility/reimg',
+		'build82/utility/context_blender'
         ], 
-    function(dom, domConstruct, domClass, on, baseFx, reimg, blender) {
+    function(dom, domConstruct, domClass, on, baseFx, ga, reimg, blender) {
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
-			staticImage_url: 'images/ifoe_white.png',	// transparent with white graphic
+			staticImage_url: 'images/ifoe_white.svg',	// transparent with white graphic
 			defaultSize: {								// default size
 				width: 900,
 				height: 600
@@ -135,7 +136,7 @@ define(['dojo/dom',
 				data.changed = true;
 			}
 			
-			// create drawing context (prevent dom jump)
+			// create drawing context & trigger redraw
 			destroyOldContext();
 			var ctx = createPreviewContext();
 			redrawBrowser();
@@ -406,7 +407,7 @@ define(['dojo/dom',
 				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
 				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value, dom.byId(config.form_id)['blendmode'].value, dom.byId(config.form_id)['opacity'].value);
 			}
-			reimg.fromCanvas(ctx.canvas).downloadPng();
+			reimg.fromCanvas(ctx.canvas).downloadPng('flag_of_earth');
 			inputDisable(false);
 			
 			// cleanup
