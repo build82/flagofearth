@@ -1,1 +1,1 @@
-body>div .responsive{width:100%}@media (max-width: 900px){#canvasContainer{width:100%;height:auto;max-height:600px}}@media (max-width: 800px){body>div h4{font-size:80%}}@media (max-width: 600px){body>div h4{font-size:70%}}
+body>div .responsive{width:100%}@media (max-width: 900px){#canvasContainer{width:100%;min-height:auto;display:block}}@media (max-width: 800px){body>div h4{font-size:80%}}@media (max-width: 600px){body>div h4{font-size:70%}}
