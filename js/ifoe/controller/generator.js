@@ -181,7 +181,6 @@ define(['dojo/dom',
 		 */
 		createContext = function() {
 			data.canvas = domConstruct.create('canvas');
-			data.canvas.className = "responsive";
 			domConstruct.place(data.canvas, config.canvasContainer_id, "first");
 			data.canvasListener = on(data.canvas, 'click', handleImageClick);
 			
@@ -189,19 +188,6 @@ define(['dojo/dom',
 			if(dom.byId(config.form_id)['size'].value == "user" && data.userImage) {
 				data.canvas.height = data.userImage.height;
 				data.canvas.width = data.userImage.width;		
-
-				var container = {
-					width: dom.byId(config.canvasContainer_id).offsetWidth,
-					height: config.defaultSize.height
-				};
-				
-				// smaller than container ?
-				if(data.userImage.height < container.height && data.userImage.width < container.width) {
-					data.canvas.className = "";
-				}
-				else if(data.userImage.height >= data.userImage.width) {
-					data.canvas.className = "";
-				}
 			}
 			else {
 				data.canvas.width = config.defaultSize.width;

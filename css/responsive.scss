@@ -24,15 +24,9 @@ performance or use of this material.
 */
 
 
-// default
-body>div .responsive {
-	width: 100%;
-}
-
 // large
 @media (max-width: 900px) {
 	#canvasContainer {
-		width: 100%;
 		min-height: auto;
 		display: block;
 	}
