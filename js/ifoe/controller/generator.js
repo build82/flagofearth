@@ -287,7 +287,7 @@ define(['dojo/dom',
 		handleParamChange = function() {
 			data.changed = true;
 			dom.byId(config.control.generate_id).disabled = false;
-			dom.byId(config.control.save_id).disabled = false;
+			dom.byId(config.control.save_id).disabled = true;
 		},
 		
 		/**
