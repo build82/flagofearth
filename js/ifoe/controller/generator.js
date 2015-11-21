@@ -32,6 +32,7 @@ define(['dojo/dom',
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
 			staticImage_url: 'images/ifoe_white.svg',	// transparent with white graphic
+			matte_clr: "#013ba6",						// flag solid color
 			defaultSize: {								// default size
 				width: 900,
 				height: 600
@@ -46,7 +47,6 @@ define(['dojo/dom',
 		data = {
 			canvas: null,
 			canvasListener: null,
-			
 			staticImage: null,
 			userImage: null,
 			changed: false
@@ -59,7 +59,9 @@ define(['dojo/dom',
 		loadStaticImage = function(param_func) {
 			data.staticImage = new Image();
 			data.staticImage.addEventListener("load", function() {
+				data.changed = true;
 				param_func();
+				data.changed = false;
 			}, this);
 			
 			data.staticImage.src = config.staticImage_url;
@@ -146,7 +148,7 @@ define(['dojo/dom',
 			}
 			
 			if(data.staticImage) {
-				var matte_str = dom.byId(config.form_id)['matte'].checked ? "#013ba6" : null;
+				var matte_str = dom.byId(config.form_id)['matte'].checked ? config.matte_clr : null;
 				centerImage(ctx, data.staticImage, matte_str, dom.byId(config.form_id)['scale'].value, dom.byId(config.form_id)['blendmode'].value, dom.byId(config.form_id)['opacity'].value);
 			}
 			
@@ -404,6 +406,8 @@ define(['dojo/dom',
 			
 		return {
 			Init: function() {
+				loadStaticImage(generate);
+				
 				on(dom.byId(config.control.select_id), 'change', loadUserImage);
 				on(dom.byId(config.form_id)['smoothing'], 'change', handleParamChange);
 				on(dom.byId(config.form_id)['blendmode'], 'change', handleParamChange);
@@ -414,9 +418,6 @@ define(['dojo/dom',
 				on(dom.byId(config.form_id)['matte'], 'change', handleParamChange);
 				on(dom.byId(config.control.generate_id), 'click', handleGenerate);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
-				
-				// initial click
-				data.canvasListener = on(dom.byId(config.canvasContainer_id), 'click', handleImageClick);
 				
 				// disable generate / save
 				dom.byId(config.control.generate_id).disabled = true;
