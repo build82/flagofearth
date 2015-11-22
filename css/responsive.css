@@ -1,1 +1,1 @@
-@media (max-width: 900px){#canvasContainer{min-height:auto;display:block}}@media (max-width: 800px){body>div h4{font-size:80%}}@media (max-width: 600px){body>div h4{font-size:70%}}
+@media (max-width: 900px){#canvasContainer{height:auto;min-height:auto;display:block}#canvasContainer img,#canvasContainer canvas{top:0;transform:none}}@media (max-width: 800px){body>div h4{font-size:80%}}@media (max-width: 600px){body>div h4{font-size:70%}}
