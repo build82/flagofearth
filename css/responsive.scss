@@ -27,8 +27,14 @@ performance or use of this material.
 // large
 @media (max-width: 900px) {
 	#canvasContainer {
+		height: auto;
 		min-height: auto;
 		display: block;
+		
+		img, canvas {
+			top: 0;
+			transform: none;
+		}
 	}
 }
 
