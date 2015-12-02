@@ -25,31 +25,45 @@ define(['dojo/request/xhr',
 		var config = {
 			appKey: '6sch126sunjawc5',
 			authorizeBase: 'https://www.dropbox.com/1/oauth2/authorize',
-			redirectUrl: 'http://localhost:8383/flagofearth/index.html'
+			redirectUrl: '/'
+		},
+		
+		data = {
+			redirectUrl: null
 		},
 				
-		data = {
-			
-		},
-		
-		handleAuthorize_Success = function() {
-		
-		},
-		handleAuthorize_Error = function() {
-
+		/**
+		 * retrieve Dropbox redirect url for application (default if not set)
+		 * @returns string Dropbox redirect url
+		 */
+		getRedirect = function() {
+			return data.redirectURL || location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.redirectUrl;
 		};
-		
+				
         console.log('Dropbox ready');
 
         return {
-			Authorize: function() {
+			/**
+			 * initiate Dropbox user authorization
+			 * @param url_bool bool if true, only return url (do not nativate to url)
+			 * @returns string application specific Dropbox user authentication url
+			 */
+			Authorize: function(url_bool) {
 				var dropboxUrl = config.authorizeBase + '?' + ioQuery.objectToQuery({
 					client_id: config.appKey,
 					response_type: 'token',
-					redirect_uri: config.redirectUrl
+					redirect_uri: getRedirect()
 				});
 		
-				window.location = dropboxUrl;
+				if(!url_bool) {
+					location.assign(dropboxUrl);
+				}
+				
+				return dropboxUrl;
+			},
+			
+			SetRedirect: function(url) {
+				data.redirectURL = url;
 			}
 		};
     } 

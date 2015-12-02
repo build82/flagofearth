@@ -22,13 +22,14 @@
 define(['dojo/dom',
 		'dojo/dom-construct',
 		'dojo/dom-class',
-        'dojo/on',
+		'dojo/io-query',
+		'dojo/on',
 		'dojo/_base/fx',
 		'build82/controller/ga',
 		'build82/controller/dropbox',
 		'build82/utility/reimg'
-        ], 
-    function(dom, domConstruct, domClass, on, baseFx, ga, dropbox, reimg) {
+		], 
+    function(dom, domConstruct, domClass, ioQuery, on, baseFx, ga, dropbox, reimg) {
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
@@ -44,14 +45,17 @@ define(['dojo/dom',
 				save_id: 'control_image_save',			// save button
 				dropbox_id: 'control_dropbox_authorize'	// dropbox button
 			},
-			form_id: 'control_form'						// form with "blendmode", "opacity", and "size"
+			form_id: 'control_form',					// form with "blendmode", "opacity", and "size"
+			appIndexUrl: 'index.html',					// application index page
+			dropboxRedirectUrl: '/oauth/dropbox.html'	// Dropbox OAuth redirect url
 		},
 		data = {
 			canvas: null,
 			canvasListener: null,
 			staticImage: null,
 			userImage: null,
-			changed: false
+			changed: false,
+			oauth: {}
 		},
 		
 		/**
@@ -337,6 +341,34 @@ define(['dojo/dom',
 			});
 			
 			reimg.fromCanvas(data.canvas).downloadPng('flag_of_earth');
+		},
+		
+		handleDropbox = function() {handleOAuth('dropbox')},
+		handleOAuth = function(provider) {
+			var providerUrl = null;
+			switch(provider) {
+				case 'dropbox' :
+					dropbox.SetRedirect(location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.dropboxRedirectUrl);
+					providerUrl = dropbox.Authorize(true);
+					break;
+				default :
+					return;
+			}
+			
+			var oauth_win = window.open(providerUrl, 'oauth');
+			
+			// listen for custom "close" event
+			var oauth_lis = on(window, 'finished', function(evt) {
+				oauth_lis.remove();
+				
+				if(oauth_win.location.origin.search(window.location.origin) !== -1) {
+					switch(provider) {
+						case 'dropbox' :
+							data.oauth.dropbox = ioQuery.queryToObject(oauth_win.location.hash.substring(1));
+							break;
+					}
+				}
+			});
 		};
 			
 		return {
@@ -353,9 +385,27 @@ define(['dojo/dom',
 				on(dom.byId(config.form_id)['matte'], 'change', handleParamChange);
 				on(dom.byId(config.control.generate_id), 'click', handleGenerate);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
-				on(dom.byId(config.control.dropbox_id), 'click', dropbox.Authorize);
+				on(dom.byId(config.control.dropbox_id), 'click', handleDropbox);
 				
 				console.log('iFoE Generator Init Complete.');
+			},
+			
+			OAuthReturn: function() {				
+				if(window.opener) {
+					// invoke token parsing with custom "finished" event
+					on.emit(window.opener, 'finished', {
+						bubbles: true,
+						cancelable: false
+					});
+					
+					setTimeout(function() {
+						window.close();
+					}, 1000);
+				}
+				// otherwise, goto index
+				else {
+					window.location.assign(location.pathname.replace(/(oauth\/)?[^/]*$/, '') + config.appIndexUrl);
+				}
 			}
 		};
 	}

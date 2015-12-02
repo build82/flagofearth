@@ -24,15 +24,15 @@ var dojoConfig = {
 	parseOnLoad: true,
 	packages: [{
 		name: "ifoe",
-		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/ifoe'
+		location: location.pathname.replace(/(\/oauth)?\/[^/]*$/, '') + '/js/ifoe'
 	},{
 		name: "build82",
-		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/build82'
+		location: location.pathname.replace(/(\/oauth)?\/[^/]*$/, '') + '/js/build82'
 	},{
 		name: "dojo",
-		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/dojo'
+		location: location.pathname.replace(/(\/oauth)?\/[^/]*$/, '') + '/js/dojo'
 	},{
 		name: "dojox",
-		location: location.pathname.replace(/\/[^/]*$/, '') + '/js/dojox'
+		location: location.pathname.replace(/(\/oauth)?\/[^/]*$/, '') + '/js/dojox'
 	}]
 };
