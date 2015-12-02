@@ -137,6 +137,10 @@ nav .feature {
 	}
 }
 
+body>div {
+	text-align: center;
+}
+
 #canvasContainer {
 	@include preserve3d();
 	height: 600px;
@@ -224,8 +228,12 @@ nav .feature {
 	}
 }
 
-body>div {
-	text-align: center;
+#control_dropbox_authorize {
+	width: 150px;
+	display: block;
+	margin: 0 auto;
+	border: 1px solid lightgrey;
+	cursor: pointer;
 }
 
 article {

@@ -25,9 +25,10 @@ define(['dojo/dom',
         'dojo/on',
 		'dojo/_base/fx',
 		'build82/controller/ga',
+		'build82/controller/dropbox',
 		'build82/utility/reimg'
         ], 
-    function(dom, domConstruct, domClass, on, baseFx, ga, reimg) {
+    function(dom, domConstruct, domClass, on, baseFx, ga, dropbox, reimg) {
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
@@ -40,7 +41,8 @@ define(['dojo/dom',
 			control: {									
 				select_id: 'control_image_selector',	// file select element
 				generate_id: 'control_image_generate',	// generate button
-				save_id: 'control_image_save'			// save button
+				save_id: 'control_image_save',			// save button
+				dropbox_id: 'control_dropbox_authorize'	// dropbox button
 			},
 			form_id: 'control_form'						// form with "blendmode", "opacity", and "size"
 		},
@@ -351,6 +353,7 @@ define(['dojo/dom',
 				on(dom.byId(config.form_id)['matte'], 'change', handleParamChange);
 				on(dom.byId(config.control.generate_id), 'click', handleGenerate);
 				on(dom.byId(config.control.save_id), 'click', handleSave);
+				on(dom.byId(config.control.dropbox_id), 'click', dropbox.Authorize);
 				
 				console.log('iFoE Generator Init Complete.');
 			}
