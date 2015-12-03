@@ -23,13 +23,13 @@ define(['dojo/request/xhr',
 		'dojo/io-query'],
     function(xhr, ioQuery) {
 		var config = {
-			appKey: '6sch126sunjawc5',
 			authorizeBase: 'https://www.dropbox.com/1/oauth2/authorize',
 			redirectUrl: '/'
 		},
 		
 		data = {
-			redirectUrl: null
+			redirectUrl: null,
+			appKey: null
 		},
 				
 		/**
@@ -50,7 +50,7 @@ define(['dojo/request/xhr',
 			 */
 			Authorize: function(url_bool) {
 				var dropboxUrl = config.authorizeBase + '?' + ioQuery.objectToQuery({
-					client_id: config.appKey,
+					client_id: data.appKey,
 					response_type: 'token',
 					redirect_uri: getRedirect()
 				});
@@ -64,6 +64,10 @@ define(['dojo/request/xhr',
 			
 			SetRedirect: function(url) {
 				data.redirectURL = url;
+			},
+			
+			SetAppKey: function(key) {
+				data.appKey = key;
 			}
 		};
     } 

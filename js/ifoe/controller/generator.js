@@ -47,7 +47,10 @@ define(['dojo/dom',
 			},
 			form_id: 'control_form',					// form with "blendmode", "opacity", and "size"
 			appIndexUrl: 'index.html',					// application index page
-			dropboxRedirectUrl: '/oauth/dropbox.html'	// Dropbox OAuth redirect url
+			dropbox: {
+				redirectUrl: '/oauth/dropbox.html',		// Dropbox OAuth redirect url
+				appKey: '6sch126sunjawc5'				// Dropbox App key
+			}
 		},
 		data = {
 			canvas: null,
@@ -288,7 +291,7 @@ define(['dojo/dom',
 				
 		/**
 		 * record change & initiate image generation
-		 * @params void
+		 * @returns void
 		 */
 		handleParamChange = function() {
 			data.changed = true;
@@ -343,12 +346,44 @@ define(['dojo/dom',
 			reimg.fromCanvas(data.canvas).downloadPng('flag_of_earth');
 		},
 		
-		handleDropbox = function() {handleOAuth('dropbox')},
+		/**
+		 * initiate user app authorization process, toggle image if already authorized
+		 * @returns void
+		 */
+		handleDropbox = function() {
+			if(!data.oauth.dropbox) {
+				handleOAuth('dropbox');
+				return;
+			}
+			
+			data.oauth.dropbox.enabled = !data.oauth.dropbox.enabled;
+			displayDropboxIcon();
+		},
+		
+		/**
+		 * toggles the blue/grey Dropbox icon
+		 * @returns void
+		 */
+		displayDropboxIcon = function() {
+			if(data.oauth.dropbox && data.oauth.dropbox.enabled) {
+				dom.byId(config.control.dropbox_id).src = 'images/dropbox-blue-horiz.png';
+			}
+			else {
+				dom.byId(config.control.dropbox_id).src = 'images/dropbox-grey-horiz.png';
+			}
+		},
+		
+		/**
+		 * Initiate OAuth user/app authorization process
+		 * @param provider string identifier of OAuth provider
+		 * @returns void
+		 */
 		handleOAuth = function(provider) {
 			var providerUrl = null;
 			switch(provider) {
 				case 'dropbox' :
-					dropbox.SetRedirect(location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.dropboxRedirectUrl);
+					dropbox.SetAppKey(config.dropbox.appKey);
+					dropbox.SetRedirect(location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.dropbox.redirectUrl);
 					providerUrl = dropbox.Authorize(true);
 					break;
 				default :
@@ -357,17 +392,25 @@ define(['dojo/dom',
 			
 			var oauth_win = window.open(providerUrl, 'oauth');
 			
-			// listen for custom "close" event
-			var oauth_lis = on(window, 'finished', function(evt) {
-				oauth_lis.remove();
+			// listen for custom events
+			var oauthFinished_lis = on(window, 'b82_oauth_finished', function(evt) {
+				oauthFinished_lis.remove();
+				oauthError_lis.remove();
 				
 				if(oauth_win.location.origin.search(window.location.origin) !== -1) {
 					switch(provider) {
 						case 'dropbox' :
 							data.oauth.dropbox = ioQuery.queryToObject(oauth_win.location.hash.substring(1));
+							data.oauth.dropbox.enabled = true;
+							displayDropboxIcon();
 							break;
 					}
 				}
+			});
+			
+			var oauthError_lis = on(window, 'b82_oauth_error', function(evt) {
+				oauthFinished_lis.remove();
+				oauthError_lis.remove();
 			});
 		};
 			
@@ -393,7 +436,7 @@ define(['dojo/dom',
 			OAuthReturn: function() {				
 				if(window.opener) {
 					// invoke token parsing with custom "finished" event
-					on.emit(window.opener, 'finished', {
+					on.emit(window.opener, 'b82_oauth_finished', {
 						bubbles: true,
 						cancelable: false
 					});
@@ -401,6 +444,24 @@ define(['dojo/dom',
 					setTimeout(function() {
 						window.close();
 					}, 1000);
+				}
+				// otherwise, goto index
+				else {
+					window.location.assign(location.pathname.replace(/(oauth\/)?[^/]*$/, '') + config.appIndexUrl);
+				}
+			},
+			
+			OAuthError: function() {
+				if(window.opener) {
+					// disable token parsing with custom event
+					on.emit(window.opener, 'b82_oauth_error', {
+						bubbles: true,
+						cancelable: false
+					});
+					
+					setTimeout(function() {
+						window.close();
+					}, 2000);
 				}
 				// otherwise, goto index
 				else {

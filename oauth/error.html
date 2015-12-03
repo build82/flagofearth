@@ -20,7 +20,7 @@ incidental or consequential damages in connection with the furnishing,
 performance or use of this material.
 -->
 <!--
-    Created on : Dec 2, 2015, 11:46:24 AM
+    Created on : Dec 2, 2015, 6:03:58 AM
     Author     : Build 82 <courier@build82.com>
 -->
 <html>
@@ -37,12 +37,8 @@ performance or use of this material.
 	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css"> 
 	
 	<script>
-		if(location.hash.search('error') !== -1) {
-			location.assign('error.html');
-		}
-
 		require(['ifoe/controller/generator', 'build82/controller/ga', 'dojo/domReady!'], function (generator, ga) {
-			generator.OAuthReturn();
+			generator.OAuthError();
 			
 			ga('create', 'UA-60731983-2', 'auto');
 			ga('send', 'pageview');
@@ -53,9 +49,8 @@ performance or use of this material.
 	<header>
 	</header>
 	<div>
-		<img src="../images/dropbox-blue-horiz.png" style="margin-top:2em; width:150px;"/>
-		<h2>Success</h2>
-		<p>iFoE (Image Generator) has been authorized. You are now able to save to Dropbox.</p>
+		<h2>Error</h2>
+		<p>iFoE (Image Generator) has not been authorized. Please try again.</p>
 	</div>
 	<footer>
 		<p>
