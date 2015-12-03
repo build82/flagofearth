@@ -19,17 +19,22 @@
  * performance or use of this material.
  */
 
-define(['dojo/request/xhr',
-		'dojo/io-query'],
+define(['build82/utility/xhr',
+		'dojo/io-query'
+		],
     function(xhr, ioQuery) {
 		var config = {
-			authorizeBase: 'https://www.dropbox.com/1/oauth2/authorize',
+			base: {
+				authorize: 'https://www.dropbox.com/1/oauth2/authorize',
+				upload: 'https://content.dropboxapi.com/1/files_put/auto/'
+			},
 			redirectUrl: '/'
 		},
 		
 		data = {
 			redirectUrl: null,
-			appKey: null
+			appKey: null,
+			accessToken: null
 		},
 				
 		/**
@@ -38,18 +43,46 @@ define(['dojo/request/xhr',
 		 */
 		getRedirect = function() {
 			return data.redirectURL || location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.redirectUrl;
+		},
+		
+		/**
+		 * create a Blob from a dataUrl
+		 * @param dataUrl string a "data:image/png:base64,AFF347f...." style data url
+		 * @returns Blob binary data blob
+		 */
+		createBlob = function(dataUrl) {
+			var blob_bin = atob(dataUrl.split(',')[1]);
+			delete dataUrl;
+			var data_ary = new Uint8Array(blob_bin.length);
+			for(var i = 0; i < blob_bin.length; i++) {
+				data_ary[i] = blob_bin.charCodeAt(i);
+			}
+			delete blob_bin;
+			return new Blob([data_ary], {type: 'image/png'});
 		};
 				
         console.log('Dropbox ready');
 
         return {
+			SetAppKey: function(key) {
+				data.appKey = key;
+			},
+			
+			SetRedirect: function(url) {
+				data.redirectURL = url;
+			},
+			
+			SetAccessToken: function(token) {
+				data.accessToken = token;
+			},
+			
 			/**
 			 * initiate Dropbox user authorization
 			 * @param url_bool bool if true, only return url (do not nativate to url)
 			 * @returns string application specific Dropbox user authentication url
 			 */
 			Authorize: function(url_bool) {
-				var dropboxUrl = config.authorizeBase + '?' + ioQuery.objectToQuery({
+				var dropboxUrl = config.base.authorize + '?' + ioQuery.objectToQuery({
 					client_id: data.appKey,
 					response_type: 'token',
 					redirect_uri: getRedirect()
@@ -62,12 +95,23 @@ define(['dojo/request/xhr',
 				return dropboxUrl;
 			},
 			
-			SetRedirect: function(url) {
-				data.redirectURL = url;
-			},
-			
-			SetAppKey: function(key) {
-				data.appKey = key;
+			Upload: function(dataUrl, filename, success, fail, progress) {
+				if(!data.accessToken) {
+					return
+				}
+				
+				// send
+				return xhr(config.base.upload + filename, {
+					method: 'PUT',
+					query: {
+						overwrite: false,
+					},
+					data: createBlob(dataUrl),
+					headers: {
+						'Authorization' : 'Bearer ' + data.accessToken
+					},
+					handleAs: 'json'
+				}).then(success, fail, progress);
 			}
 		};
     } 

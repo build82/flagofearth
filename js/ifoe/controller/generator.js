@@ -343,7 +343,21 @@ define(['dojo/dom',
 							' smoothing:'+dom.byId(config.form_id)['smoothing'].checked
 			});
 			
-			reimg.fromCanvas(data.canvas).downloadPng('flag_of_earth');
+			if(data.oauth.dropbox && data.oauth.dropbox.enabled) {
+				dropbox.Upload(data.canvas.toDataURL('image/png'), 'flag_of_earth.png', handleSave_Success, handleSave_Fail, handleSave_Progress);
+			}
+			else {
+				reimg.fromCanvas(data.canvas).downloadPng('flag_of_earth');
+			}
+		},
+		handleSave_Success = function(res) {
+			console.log('success', res);
+		},
+		handleSave_Fail = function(err) {
+			console.log('error', err);
+		},
+		handleSave_Progress = function(evt) {
+			console.log('progress', evt)
 		},
 		
 		/**
@@ -392,7 +406,7 @@ define(['dojo/dom',
 			
 			var oauth_win = window.open(providerUrl, 'oauth');
 			
-			// listen for custom events
+			// listen for oauth finish
 			var oauthFinished_lis = on(window, 'b82_oauth_finished', function(evt) {
 				oauthFinished_lis.remove();
 				oauthError_lis.remove();
@@ -401,6 +415,7 @@ define(['dojo/dom',
 					switch(provider) {
 						case 'dropbox' :
 							data.oauth.dropbox = ioQuery.queryToObject(oauth_win.location.hash.substring(1));
+							dropbox.SetAccessToken(data.oauth.dropbox.access_token);
 							data.oauth.dropbox.enabled = true;
 							displayDropboxIcon();
 							break;
@@ -408,6 +423,7 @@ define(['dojo/dom',
 				}
 			});
 			
+			// listen for oauth error
 			var oauthError_lis = on(window, 'b82_oauth_error', function(evt) {
 				oauthFinished_lis.remove();
 				oauthError_lis.remove();
