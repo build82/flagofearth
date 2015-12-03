@@ -357,7 +357,7 @@ define(['dojo/dom',
 			console.log('error', err);
 		},
 		handleSave_Progress = function(evt) {
-			console.log('progress', evt)
+			console.log('progress', evt);
 		},
 		
 		/**
@@ -397,7 +397,7 @@ define(['dojo/dom',
 			switch(provider) {
 				case 'dropbox' :
 					dropbox.SetAppKey(config.dropbox.appKey);
-					dropbox.SetRedirect(location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.dropbox.redirectUrl);
+					dropbox.SetRedirect(location.origin + location.pathname.replace(/\/[^\/]*$/, '') + config.dropbox.redirectUrl);
 					providerUrl = dropbox.Authorize(true);
 					break;
 				default :
@@ -463,7 +463,7 @@ define(['dojo/dom',
 				}
 				// otherwise, goto index
 				else {
-					window.location.assign(location.pathname.replace(/(oauth\/)?[^/]*$/, '') + config.appIndexUrl);
+					window.location.assign(location.pathname.replace(/(oauth\/)?[^\/]*$/, '') + config.appIndexUrl);
 				}
 			},
 			
@@ -481,7 +481,7 @@ define(['dojo/dom',
 				}
 				// otherwise, goto index
 				else {
-					window.location.assign(location.pathname.replace(/(oauth\/)?[^/]*$/, '') + config.appIndexUrl);
+					window.location.assign(location.pathname.replace(/(oauth\/)?[^\/]*$/, '') + config.appIndexUrl);
 				}
 			}
 		};

@@ -42,7 +42,7 @@ define(['build82/utility/xhr',
 		 * @returns string Dropbox redirect url
 		 */
 		getRedirect = function() {
-			return data.redirectURL || location.origin + location.pathname.replace(/\/[^/]*$/, '') + config.redirectUrl;
+			return data.redirectURL || location.origin + location.pathname.replace(/\/[^\/]*$/, '') + config.redirectUrl;
 		},
 		
 		/**
@@ -97,14 +97,14 @@ define(['build82/utility/xhr',
 			
 			Upload: function(dataUrl, filename, success, fail, progress) {
 				if(!data.accessToken) {
-					return
+					return;
 				}
 				
 				// send
 				return xhr(config.base.upload + filename, {
 					method: 'PUT',
 					query: {
-						overwrite: false,
+						overwrite: false
 					},
 					data: createBlob(dataUrl),
 					headers: {

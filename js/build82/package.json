@@ -1,10 +1,10 @@
 {
 	"name": "build82",
-	"version":"1.0",
+	"version":"1.1",
 	"dependencies": {
 		"dojo":"1.10.4",
 		"dijit":"1.10.4"
 	},
-	"description": "iFoE Application",
+	"description": "Build 82 - JS Modules",
 	"dojoBuild": "build82.profile.js"
 }
