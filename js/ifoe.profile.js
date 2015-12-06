@@ -21,7 +21,7 @@ var profile = {
 	
 	packages: [
 		{name:'ifoe', location:'ifoe'},
-		{name:'buil82', location:'build82'},
+		{name:'build82', location:'build82'},
 		{name:'dojo', location:'dojo'},
 		{name:'dijit', location:'dijit'},
 		{name:'dojox', location:'dojox'}
@@ -33,9 +33,10 @@ var profile = {
 			boot: true,
 			include: [ "build82/controller/fb",
 					   "build82/controller/ga",
-					   "build82/controller/fb",
 					   "build82/controller/twitter",
+					   "build82/controller/dropbox",
 					   "build82/utility/reimg",
+					   "build82/utility/xhr",
 					   "ifoe/controller/config",
 					   "ifoe/controller/generator",
 					   "ifoe/controller/menu",

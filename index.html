@@ -47,7 +47,7 @@ performance or use of this material.
 	<link rel="author" href="mailto:courier@build82.com"/>
 	<script type="text/javascript" src="js/flagofearth.js"></script>
 	<script type="text/javascript" src="js/dojo/dojo.js"></script>
-	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css"> 
+	<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/resources/dojo.css"> 
 	<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/tundra/tundra.css">
 
 	<script>
@@ -87,8 +87,8 @@ performance or use of this material.
 				</div>
 				<div class="control_group">
 					<h3>Settings</h3>
-					<div class="control">
-						Blend Mode : <select name="blendmode">
+					<div class="control flex2col">
+						<span class="prompt">Blend Mode :</span><select name="blendmode">
 							<option value="source-over" selected="selected">No Blend</option>
 							<option value="multiply">Multiply</option>
 							<option value="overlay">Overlay</option>
@@ -105,8 +105,8 @@ performance or use of this material.
 							<option value="exclusion">Exclusion</option>
 						</select>
 					</div>
-					<div class="control">
-						Overlay Scale : <select name="scale">
+					<div class="control flex2col">
+						<span class="prompt">Overlay Scale :</span><select name="scale">
 							<option value="150">150%</option>
 							<option value="140">140%</option>
 							<option value="130">130%</option>
@@ -124,8 +124,8 @@ performance or use of this material.
 							<option value="10">10%</option>
 						</select>
 					</div>
-					<div class="control">
-						Overlay Opacity : <select name="opacity">
+					<div class="control flex2col">
+						<span class="prompt">Overlay Opacity :</span><select name="opacity">
 							<option value="100" selected="selected">100%</option>
 							<option value="90">90%</option>
 							<option value="80">80%</option>
@@ -145,12 +145,15 @@ performance or use of this material.
 					<div class="control flex2col">
 						<span class="prompt">Fit Image :</span><input name="size" type="radio" value="user" checked/>
 						<span class="prompt">900px &middot; 600px :</span><input name="size" type="radio" value="flag"/>
-						<span class="prompt">Smoothing :</span><input name="smoothing" type="checkbox" value="true" checked/>
+						<span class="prompt">Smoothing :</span><input name="smoothing" type="checkbox" value="true"/>
 						<span class="prompt">Blue Matte :</span><input name="matte" type="checkbox" value="true" checked/>
 					</div>
 				</div>
 				<div class="control">
 					<button id="control_image_generate" type="button">Update</button>
+				</div>
+				<div class="control">
+					<img id="control_dropbox_authorize" src="images/dropbox-grey-horiz.png"/>
 				</div>
 				<div class="control">
 					<button id="control_image_save" type="button">Save</button>
@@ -159,7 +162,7 @@ performance or use of this material.
 		</div>
 	</div>
 	<div id="boilerplate">
-		<div class="fb-like" data-href="http://ifoe.build82.com/" data-layout="button_count" data-action="like" data-width="350" data-show-faces="true" data-share="true"></div>
+		<div class="fb-like" data-href="http://ifoe.build82.com/" data-layout="button" data-action="like" data-width="350" data-show-faces="true" data-share="true"></div>
 		<div><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://ifoe.build82.com" data-text="International Flag of Earth : Support planetary solidarity." data-hashtags="HealTheWorld,SpreadLove,iFoE"></a></div>
 	</div>
 	<footer>

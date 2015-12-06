@@ -1,10 +1,11 @@
 {
 	"name": "ifoe",
-	"version":"1.0",
+	"version":"1.1",
 	"dependencies": {
 		"dojo":"1.10.4",
-		"dijit":"1.10.4"
+		"dijit":"1.10.4",
+		"build82":"1.1"
 	},
-	"description": "iFoE Application",
+	"description": "iFlag of Earth Application",
 	"dojoBuild": "ifoe.profile.js"
 }
