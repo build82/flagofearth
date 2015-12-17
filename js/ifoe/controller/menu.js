@@ -32,10 +32,11 @@ define(['dojo/query',
         'dojo/on',
         'dojo/_base/array',
 		'ifoe/controller/config',
-		'ifoe/controller/menuitem'
+		'ifoe/controller/menuitem',
+		'ifoe/controller/menuseparator'
         ], 
     function(query, baseFx, fx, easing, aspect, nld, dom, domConstruct, domClass, domStyle, on, baseArray,
-		Config, MenuItem) {
+		Config, MenuItem, MenuSeparator) {
 		var config = {
 			content: Config.Link,
 			featureOffset: 50,
@@ -71,7 +72,13 @@ define(['dojo/query',
 			// create menu & animations
 			var zipperAnimation_ary = [];
 			baseArray.forEach(config.content, function(feature, index) {
-				var feat_ele = MenuItem(feature);
+				if(!feature.separator) {
+					var feat_ele = new MenuItem(feature);
+				}
+				else {
+					var feat_ele = new MenuSeparator();
+				}
+				
 				domConstruct.place(feat_ele.domNode, config.nav_list_id, 'last');
 				
 				// animation start style & postiion
@@ -145,11 +152,21 @@ define(['dojo/query',
 					duration: 100
 				}));
 			});
+			query('div.separator').forEach(function(sep, index) {
+				// fade out
+				tearAnimation_ary.push(baseFx.fadeOut({
+					node: sep,
+					easing: easing.cubicOut,
+					duration: 100
+				}));
+			});
+			
 			
 			// play & destroy menu
 			var tear = fx.combine(tearAnimation_ary);
 			aspect.after(tear, 'onEnd', function() {
 				query('div.feature').forEach(domConstruct.destroy);
+				query('div.separator').forEach(domConstruct.destroy);
 				query('nav').toggleClass('hidden');
 				
 				// show content
@@ -205,11 +222,6 @@ define(['dojo/query',
 					data.menuHandler = on(dom.byId('menu'), 'click', handleMenuOn);
 					query('a[href="#menu"]').on('click', function() {handleMenuOn()});
 				}
-				
-				// order by year descending
-				config.content.sort(function(a, b) {
-					return b.year - a.year;
-				});
 				
 				console.log('iFoE Menu Init Complete.');
 			},

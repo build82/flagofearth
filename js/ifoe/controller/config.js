@@ -23,19 +23,29 @@ define(
     function() {
 		return {
 			Link: [
-				{url: 'http://www.flagofplanetearth.com', name: 'The International Flag of Planet Earth', type: 'website'},
-				{url: 'https://en.wikipedia.org/wiki/Flag_of_the_Earth', name: 'Wikipedia : Flag of the Earth', type: 'website'},
-				{url: 'https://www.facebook.com/ifoearth', name: 'Facebook : International Flag of Earth - Image Generator', type: 'website'},
-				{url: 'http://nosdare.gliscam.us', name: 'Internationalis Vexillum Terrae', type: 'website'},
-				{url: 'https://facebook.com', name: 'Facebook, Inc.', type: 'organization'},
-				{url: 'https://twitter.com', name: 'Twitter, Inc.', type: 'organization'},
-				{url: 'https://dropbox.com', name: 'Dropbox Inc.', type: 'organization'}
-			],
-			TypeName: {
-				website: 'Website',
-				organization: 'Organization',
-				person: 'Person'
-			}
+				{url: 'index.html', name: 'Application', type: 'local', 
+					description: "The International Flag of Earth - Image Generator application."
+				},
+				{url: 'instructions.html', name: 'Instructions', type: 'local', 
+					description: "A detailed description of the application interface and controls."
+				},
+				{separator: true},
+				{url: 'https://en.wikipedia.org/wiki/Flag_of_the_Earth', name: 'Wikipedia : Flag of the Earth', type: 'website',
+					description: "Wikipedia's article on flags of earth contains a brief discussion about flags representing Earth and mentions\n\
+					short history of other proposals."
+				},
+				{url: 'https://www.facebook.com/ifoearth', name: 'Facebook : International Flag of Earth - Image Generator', type: 'website',
+					description: "The Facebook Page of iFlag of Earth where poeople can discuss the application, share their overlays, and \n\
+					share the application with their friends & followers."
+				},
+				{url: 'http://nosdare.gliscam.us', name: 'Internationalis Vexillum Terrae', type: 'mirror',
+					description: "The Latin mirror of iFlag of Earth."
+				},
+				{separator: true},
+				{url: 'https://facebook.com', name: 'Facebook, Inc.', type: 'organization', description: ""},
+				{url: 'https://twitter.com', name: 'Twitter, Inc.', type: 'organization', description: ""},
+				{url: 'https://dropbox.com', name: 'Dropbox Inc.', type: 'organization', description: ""}
+			]
 		};
 	}
 );

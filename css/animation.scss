@@ -32,7 +32,29 @@ performance or use of this material.
 }
 
 /*
-	Lighten Navigation Animation
+	Lighten Navigation Animation - local links
+*/
+@keyframes pulseLocal_anim {
+	from {background-color: $localLink_clr;}
+	to {background-color: $localLink_clr + ($lighten_clr * 2.5);}
+}
+@-webkit-keyframes pulseLocal_anim {
+	from {background-color: $localLink_clr;}
+	to {background-color: $localLink_clr + ($lighten_clr * 2.5);}
+}
+@-moz-keyframes pulseLocal_anim {
+	from {background-color: $localLink_clr;}
+	to {background-color: $localLink_clr + ($lighten_clr * 2.5);}
+}
+.pulseLocalAnim {
+	@include anim-name(pulseLocal_anim);
+	@include anim-duration(.5s);
+	@include anim-direction(alternate);
+	@include anim-iteration(infinite);
+}
+
+/*
+	Lighten Navigation Animation - all other menu items
 */
 @keyframes pulseNav_anim {
 	from {background-color: $feature_clr;}

@@ -100,7 +100,7 @@ nav .feature {
 	width: 60%;
 	max-width: 375px;
 	border: 1px solid $textGrey_clr;
-	padding: 8px 5px 0 5px;
+	padding: 8px 5px 10px;
 	background-color: $feature_clr;
 	color: $textGrey_clr - ($darken_clr * 2);
 	cursor: pointer;
@@ -123,6 +123,30 @@ nav .feature {
 		border-color: rgb(170, 170, 170);
 		margin: 10px 5px 10px 5px;
 	}
+	
+	&.local {
+		border-color: $azure_clr;
+		background-color: $localLink_clr;
+		&:hover {
+			@extend .pulseLocalAnim;
+		}
+	}
+	
+	&.organization {
+		width: 150px;
+		
+		hr {
+			display: none;
+		}
+	}
+}
+
+nav .separator {
+	margin: 1.2em auto;
+	height: 21px;
+	width: 21px;
+	background-image: url('../images/ifoe_blue.png');
+	background-size: 21px 21px;
 }
 
 #nav_home {
@@ -247,15 +271,15 @@ article {
 	
 	p {
 		text-align: justify;
-		
-		a {
-			color: inherit;
-		}
+	}
+	
+	a {
+		color: inherit;
 	}
 }
 
 #boilerplate {
-    margin: 4em auto 8em auto;
+    margin: 2em auto 6.5em;
     max-width: 350px;
 	display: flex;
 	
