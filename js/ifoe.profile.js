@@ -41,6 +41,7 @@ var profile = {
 					   "ifoe/controller/generator",
 					   "ifoe/controller/menu",
 					   "ifoe/controller/menuitem",
+					   "ifoe/controller/menuseparator",
 					   "ifoe/view/interface"
 			]
 		}
