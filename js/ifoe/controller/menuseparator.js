@@ -27,20 +27,8 @@ define(['dojo/_base/declare',
 		'dijit/_Templated'
 		], 
     function(declare, baseArray, domConstruct, on, _Widget, _Templated) {
-		return declare('ifoe.controller.menuitem', [_Widget, _Templated], {
-			name: '',
-			url: '',
-			type: '',
-			templateString: '<div class="feature ${type}"><span class="name">${name}</span><hr><span class="description">${description}</div>',
-			postCreate: function() {
-				this.inherited(arguments);
-				var self = this;
-				
-				// click handler
-				on(self.domNode, 'click', function(evt) {
-					window.location.href = self.url;
-				});
-			}
+		return declare('ifoe.controller.menuseparator', [_Widget, _Templated], {
+			templateString: '<div class="separator"></div>',
 		});
 	}
 );
