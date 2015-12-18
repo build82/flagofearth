@@ -31,14 +31,14 @@ define(
 				},
 				{separator: true},
 				{url: 'https://en.wikipedia.org/wiki/Flag_of_the_Earth', name: 'Wikipedia : Flag of the Earth', type: 'website',
-					description: "Wikipedia's article on flags of earth contains a brief discussion about flags representing Earth and mentions\n\
-					short history of other proposals."
+					description: "Wikipedia's article on flags of earth contains a brief discussion about flags representing Earth and \n\
+					a short history of other proposals."
 				},
 				{url: 'https://www.facebook.com/ifoearth', name: 'Facebook : International Flag of Earth - Image Generator', type: 'website',
-					description: "The Facebook Page of iFlag of Earth where poeople can discuss the application, share their overlays, and \n\
-					share the application with their friends & followers."
+					description: "Visit iFlag of Earth's Facebook Page to request assistance, share overlays, and share the \n\
+					application with their friends & followers."
 				},
-				{url: 'http://nosdare.gliscam.us', name: 'Internationalis Vexillum Terrae', type: 'mirror',
+				{url: 'https://nosdare.gliscam.us', name: 'Internationalis Vexillum Terrae', type: 'mirror',
 					description: "The Latin mirror of iFlag of Earth."
 				},
 				{separator: true},
