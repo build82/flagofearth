@@ -120,12 +120,14 @@ nav .feature {
 	}
 	
 	hr {
-		border-color: rgb(170, 170, 170);
+		height: 1px;
+		background-color: rgb(170, 170, 170);
+		border: none;
 		margin: 10px 5px 10px 5px;
 	}
 	
 	&.local {
-		border-color: $azure_clr;
+		border-color: $localLinkBorder_clr;
 		background-color: $localLink_clr;
 		&:hover {
 			@extend .pulseLocalAnim;
