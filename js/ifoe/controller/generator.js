@@ -27,9 +27,10 @@ define(['dojo/dom',
 		'dojo/_base/fx',
 		'build82/controller/ga',
 		'build82/controller/dropbox',
-		'build82/utility/reimg'
-		], 
-    function(dom, domConstruct, domClass, ioQuery, on, baseFx, ga, dropbox, reimg) {
+		'build82/utility/reimg',
+		'build82/utility/context_blender'
+        ], 
+    function(dom, domConstruct, domClass, ioQuery, on, baseFx, ga, dropbox, reimg, blender) {
 		var config = {
 			interface_id: 'hero',						// element to fade in & out with redraw
 			canvasContainer_id: 'canvasContainer',		// element to create canvases in
@@ -277,16 +278,28 @@ define(['dojo/dom',
 			ctx.drawImage(param_image, 0, 0, param_image.width, param_image.height, offset.x, offset.y, scaled.width, scaled.height);
 			
 			// draw opacity
-			param_context.globalAlpha = param_opacity / 100;
+			var opacityCanvas = domConstruct.create('canvas');
+			opacityCanvas.width = param_context.canvas.width;
+			opacityCanvas.height = param_context.canvas.height;
+			var opacityCtx = opacityCanvas.getContext("2d");
+			opacityCtx.mozImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			opacityCtx.msImageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			opacityCtx.imageSmoothingEnabled = dom.byId(config.form_id)['smoothing'].checked;
+			opacityCtx.globalAlpha = param_opacity / 100;
+			opacityCtx.drawImage(ctx.canvas, 0, 0);
 			
-			// draw on context
-			param_context.globalCompositeOperation = param_blendmode;
-			param_context.drawImage(canvas, 0, 0);
-			
-			// cleanup
+			// cleanup immediately
 			domConstruct.destroy(canvas);
 			delete ctx;
 			delete canvas;
+			
+			// draw on context
+			blender.blend(opacityCtx, param_context, param_blendmode);
+			
+			// cleanup again
+			domConstruct.destroy(opacityCanvas);
+			delete opacityCtx;
+			delete opacityCanvas;
 		},
 				
 		/**
